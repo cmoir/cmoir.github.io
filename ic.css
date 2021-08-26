@@ -1,0 +1,93 @@
+TD
+{
+font-family: Verdana;
+font-size: 12px;
+}	
+
+TD.dotted
+{
+font-family: Verdana;
+font-size: 12px;
+border-left: 1px dotted #000000;
+border-bottom: 1px dotted #000000;
+}	
+
+TD.bar
+{
+font-family: Verdana;
+font-size: 11px;
+}
+
+sup {
+background-color:red;
+color:white;
+}
+
+TD.header
+{
+Font-Weight: Bold; 
+font-size: 14px;
+Border: 3px inset #808080;
+Background-Color: #A0A0A0;
+}
+
+Body
+{
+font-family: Verdana;
+font-size: 12px;
+Color: #000000;
+Background-Color: #E0E0E0;
+}
+
+Table
+{
+font-family: Verdana;
+Color: #000000;
+Background-Color: #E0E0E0;
+border: 4px outset #E0E0E0;
+padding: 5px;
+}
+
+Table.noborder
+{
+font-family: Verdana;
+border: 0px;
+}
+Table.bar
+{
+border: 0px;
+padding: 0;
+spacing: 0;
+}
+
+input	
+{
+font-family: Verdana;
+font-size: 12px;
+Color: #000000;
+Background-Color: #ffffff;
+//Border: 1px Solid #000000;
+}
+
+.radio
+{
+Background-Color: #E0E0E0;
+border 0px;	
+}
+
+.submit  {
+	border: 2px outset silver;	
+} 	
+.checkbox {
+	Background-Color: #E0E0E0;
+	border 0px;	
+}
+
+h4 {
+font-size: 13px;
+font-weight:bold;
+}
+
+.small {
+  font-size:8px;
+}
