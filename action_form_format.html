@@ -12,8 +12,11 @@ function copyToClipboard(element) {
 	  document.execCommand('copy')
 	  element.remove()
 	}
-function updateResults() {
-	document.getElementsById('p1').value = 'hello World'
+function updateResults(element) {
+	var text = $(element).clone().find('br').prepend('\r\n').end().text()
+	element = $('<textarea>').appendTo('body').val(text).select()
+	document.execCommand('copy')
+	element.remove()
 }
 	
 </script>
@@ -27,8 +30,9 @@ function updateResults() {
 <h1>Result</h1> 
 
 <TEXTAREA id="p1" cols=40 rows=5>
-	updateResults()
-</TEXTAREA>
+<%String inputText = request.getParameter("planetList");
+String stringFromJava = PlanetFormater.runPlanetFormaterr(inputText);
+out.println(stringFromJava);%></TEXTAREA>
 
 <form action="index.html" method="POST">
 	<input type="submit" value="Home" />
