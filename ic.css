@@ -57,7 +57,6 @@ Table.bar
 {
 border: 0px;
 padding: 0;
-spacing: 0;
 }
 
 input	
@@ -66,13 +65,13 @@ font-family: Verdana;
 font-size: 12px;
 Color: #000000;
 Background-Color: #ffffff;
-//Border: 1px Solid #000000;
+Border: 1px Solid #000000;
 }
 
 .radio
 {
 Background-Color: #E0E0E0;
-border 0px;	
+border: 0px;	
 }
 
 .submit  {
@@ -80,7 +79,7 @@ border 0px;
 } 	
 .checkbox {
 	Background-Color: #E0E0E0;
-	border 0px;	
+	border: 0px;	
 }
 
 h4 {

@@ -12,6 +12,10 @@ function copyToClipboard(element) {
 	  document.execCommand('copy')
 	  element.remove()
 	}
+function updateResults() {
+	document.getElementsById('p1').value = 'hello World'
+}
+	
 </script>
 
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
@@ -23,9 +27,8 @@ function copyToClipboard(element) {
 <h1>Result</h1> 
 
 <TEXTAREA id="p1" cols=40 rows=5>
-<%String inputText = request.getParameter("planetList");
-String stringFromJava = PlanetFormater.runPlanetFormaterr(inputText);
-out.println(stringFromJava);%></TEXTAREA>
+	updateResults()
+</TEXTAREA>
 
 <form action="index.html" method="POST">
 	<input type="submit" value="Home" />
