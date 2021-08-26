@@ -6,7 +6,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Summary Family News</title>
+<title>Summary Recent Reports</title>
 </head>
 <body>
  
@@ -15,11 +15,11 @@
 <p>
    <%
    String inputText = request.getParameter("news");
-   String stringFromJava = NewsAnalyser.runFamNewsAnalyser(inputText); 
+   String stringFromJava = NewsAnalyser.runRecentReportAnalyser(inputText); 
    %>
    <% out.println(stringFromJava); %>
 </p>
-<form action="index.jsp" method="POST">
+<form action="index.html" method="POST">
 	<input type="submit" value="Home" />
 </form> 
 </body>
