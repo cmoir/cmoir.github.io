@@ -7,17 +7,27 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link REL=STYLESHEET HREF="ic.css" TYPE="text/css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-	<script>
-		function copyToClipboard(element) {
-			var text = $(element).clone().find('br').prepend('\r\n').end().text()
-			element = $('<textarea>').appendTo('body').val(text).select()
-			document.execCommand('copy')
-			element.remove()
+<script type="text/javascript">
+	function copyToClipboard(element) {
+		var text = $(element).clone().find('br').prepend('\r\n').end().text();
+		element = $('<textarea>').appendTo('body').val(text).select();
+		document.execCommand('copy');
+		element.remove();
+	}
+	function updateResults() {
+		text = document.getElementById('planetList').value;
+
+		standardPlanetPatter = /(\d+,\d+:\d+)/gm;
+		newsPlanetPattern = /planet (\d+) in the (\d+)[,:](\d+) system/gm;
+		matches = text.match(standardPlanetPatter);
+		out = ''
+		for (const match of matches) {
+			out = out + " " + match + "\n";
 		}
-		function updateResults() {
-			document.getElementsById('p1').value = 'hello World'
-		}
-	</script>
+		document.getElementById('planetList').value = out;
+	}
+</script>
+
 </head>
 
 <BODY>
@@ -38,12 +48,13 @@
 
 
 	<P>
-	<TEXTAREA name="planetList" id="p1" cols=50 rows=5>
+	<TEXTAREA id="planetList" name="planetList"  cols=50 rows=5>
+		enter planet list here
 	</TEXTAREA>
 	<BR>
-
+	</P>
 	<button onclick="updateResults()">format</button>
-	<button onclick="copyToClipboard('#p1')">Copy</button>
+	<button onclick="copyToClipboard('#planetList')">Copy</button>
 
 
 	<hr>
@@ -67,3 +78,5 @@
 		<br>
 		<br>
 	</div>
+</BODY>
+</HTML>
