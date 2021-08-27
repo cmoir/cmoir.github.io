@@ -7,33 +7,47 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link REL=STYLESHEET HREF="ic.css" TYPE="text/css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script type="text/javascript">
-	function copyToClipboard(element) {
-		var text = $(element).clone().find('br').prepend('\r\n').end().text();
-		element = $('<textarea>').appendTo('body').val(text).select();
-		document.execCommand('copy');
-		element.remove();
-	}
-	function updateResults() {
-		//82,98:10
-		text = document.getElementById('planetList').value;
-		standardPlanetPatter = /(\d+,\d+:\d+)/gm;
-		matches = []
-		matches = text.match(standardPlanetPatter);
-		out = ''
-		for (const match of matches) {
-			out = out + " " + match + "\n";
+	<script type="text/javascript">
+		function copyToClipboard(element) {
+			var text = $(element).clone().find('br').prepend('\r\n').end().text();
+			element = $('<textarea>').appendTo('body').val(text).select();
+			document.execCommand('copy');
+			element.remove();
 		}
-		newsPlanetPattern = /planet (\d+) in the (\d+),(\d+) system/gm;		
-		matches = []
-		matches = text.matchAll(newsPlanetPattern);
-		for (const match of matches) {
-			out = `${out}${match[2]},${match[3]}:${match[1]}\n`
-		}	
+		function updateResults() {
+			//82,98:10
+			text = document.getElementById('planetList').value;
+			standardPlanetPatter = /(\d+,\d+:\d+)/gm;
+			matches = []
+			matches = text.match(standardPlanetPatter);
+			out = ''
+			if (matches !== null) {
+				for (const match of matches) {
+					out = out + " " + match + "\n";
+				}
+			}
 
-		document.getElementById('planetList').value = out;
-	}
-</script>
+			newsPlanetPattern = /planet (\d+) in the (\d+),(\d+) system/gm;
+			matches = []
+			matches = text.matchAll(newsPlanetPattern);
+			if (matches !== null) {
+				for (const match of matches) {
+					out = `${out}${match[2]},${match[3]}:${match[1]}\n`
+				}
+			}
+
+			lostPlanetPattern = /Our planet (\d+) at x:(\d+), y:(\d+)/gm;
+			matches = []
+			matches = text.matchAll(lostPlanetPattern);
+			if (matches !== null) {
+				for (const match of matches) {
+					out = `${out}${match[2]},${match[3]}:${match[1]}\n`
+				}
+			}
+
+			document.getElementById('planetList').value = out;
+		}
+	</script>
 
 </head>
 
@@ -55,10 +69,10 @@
 
 
 	<P>
-	<TEXTAREA id="planetList" name="planetList"  cols=50 rows=5>
+		<TEXTAREA id="planetList" name="planetList" cols=50 rows=5>
 		enter planet list here
 	</TEXTAREA>
-	<BR>
+		<BR>
 	</P>
 	<button onclick="updateResults()">format</button>
 	<button onclick="copyToClipboard('#planetList')">Copy</button>
@@ -86,4 +100,5 @@
 		<br>
 	</div>
 </BODY>
+
 </HTML>
