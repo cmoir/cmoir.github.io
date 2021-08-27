@@ -8,6 +8,23 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link REL=STYLESHEET HREF="ic.css" TYPE="text/css">
 	<script type="text/javascript">
+	    var occurrence = function (array) {
+        "use strict";
+        var result = {};
+			if (array instanceof Array) { // Check if input is array.
+				array.forEach(function (v, i) {
+					if (!result[v]) { // Initial object property creation.
+						result[v] = [i]; // Create an array for that property.
+					} else { // Same occurrences found.
+						result[v].push(i); // Fill the array.
+					}
+				});
+			}
+			return result;
+		};
+		
+		
+		
 		function updateResults() {
 			text = document.getElementById('news').value;
 			text = addLineNumber(text)
@@ -21,12 +38,23 @@
 			explorePattern = /(\d+)[\s]E[\s]T-(\d{1,4})\s+([\w+\s*\w*]*) explored planet (\d+) in the (\d+)[,:](\d+) system/gm;
 			matches = text.matchAll(explorePattern);
 			out = ''
+			playerArray = []
 			if (matches !== null) {
 				for (const match of matches) {
 					out = `${out}${match[1]} turn:${match[2]} player:${match[3]} planet:${match[5]},${match[6]}:${match[4]}\n`
+					playerArray.push(match[3])
 				}
 			}
-			document.getElementById('news').value = out;
+
+			counts = occurrence(playerArray)
+			testout = ''
+			if (counts !== null) {
+				for (const player in counts) {
+					testout = `${testout}${player} ${(counts[player].length)}\n`
+				}
+			}
+
+			document.getElementById('news').value = testout;
 		}
 
 		function addLineNumber(text) {
@@ -41,6 +69,8 @@
 			return outputWithLineNumbers
 		}
 		
+
+
 	</script>
 </head>
 
