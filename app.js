@@ -43,17 +43,9 @@ function getExploredPlanetSummary(text) {
             exploredArray.push(match[3])
         }
     }
-    counts = occurrence(exploredArray)
-    
+    exploredCounts = occurrence(exploredArray)    
     exploredSummary = `${dashes}Explored${dashes}`
-    total = 0
-    if (counts !== null) {
-        for (const player in counts) {
-            exploredSummary = `${exploredSummary}${(counts[player].length)} planet(s) Explored by ${player}<br>`
-            total = total + counts[player].length
-        }
-        exploredSummary = `${exploredSummary}${dashes}${total} planet(s) Explored${dashes}`
-    }
+    exploredSummary = buildReportSection(exploredCounts, exploredSummary, 'planet(s) Explored by', 'planet(s) Explored', true)
     return exploredSummary
 }
 
