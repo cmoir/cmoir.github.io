@@ -1,3 +1,5 @@
+dashes = '<br>--------------------<br>'
+
 function occurrence(array) {
     var result = {};
     if (array instanceof Array) { // Check if input is array.
@@ -42,7 +44,7 @@ function getExploredPlanetSummary(text) {
         }
     }
     counts = occurrence(exploredArray)
-    dashes = '<br>--------------------<br>'
+    
     exploredSummary = `${dashes}Explored${dashes}`
     total = 0
     if (counts !== null) {
@@ -55,3 +57,46 @@ function getExploredPlanetSummary(text) {
     return exploredSummary
 }
 
+function getCapturedPlanetSummary(text) {
+//The forces of niceguy took planet 8 in the 72,13 system from Justin_Bieber (6362).
+    capturePattern =/(\d+)[\s]SA[\s]T-(\d{1,4})\s+The forces of ([\w+\s*\w*]*) took planet (\d+) in the (\d+)[,:](\d+) system from ([\w+\s*\w*]*) .(\d+)../gm;
+    matches = text.matchAll(capturePattern);
+    capturedByPlayer = []
+    capturedByFamily = []
+    capturedfromEnemyPlayer = []
+    if (matches !== null) {
+        for (const match of matches) {
+            capturedByPlayer.push(match[3])
+            capturedfromEnemyPlayer.push(match[7])
+            capturedByFamily.push(match[8])
+        }
+    }
+
+    familyCounts = occurrence(capturedByFamily)
+    capturedSummary = `${dashes}Captured from Family${dashes}`
+    capturedSummary = buildReportSection(familyCounts, capturedSummary, 'planet(s) Captured from', 'planet(s) Captured', false)
+
+    enemyPlayerCounts = occurrence(capturedfromEnemyPlayer)
+    capturedSummary = `${capturedSummary}${dashes}Captured from player${dashes}`
+    capturedSummary = buildReportSection(enemyPlayerCounts, capturedSummary, 'planet(s) Captured from', 'planet(s) Captured', false)
+
+    playerCounts = occurrence(capturedByPlayer)
+    capturedSummary = `${capturedSummary}${dashes}Captured by player${dashes}`
+    capturedSummary = buildReportSection(playerCounts, capturedSummary, 'planet(s) Captured by', 'planet(s) Captured', true)
+
+    return capturedSummary
+}
+
+function buildReportSection(array, sectionSummary, textLine1, textLine2, includeSummary = true) {
+    total = 0
+    if (array !== null) {
+        for (const item in array) {
+            sectionSummary = `${sectionSummary}${(array[item].length)} ${textLine1} ${item}<br>`
+            total = total + array[item].length
+        }
+        if (includeSummary) {
+        sectionSummary = `${sectionSummary}${dashes}${total} ${textLine2}${dashes}`
+        }
+    }
+    return sectionSummary
+}
