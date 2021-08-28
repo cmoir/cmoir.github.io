@@ -51,7 +51,7 @@ function addLineNumber(text) {
         return outputWithLineNumbers
 }
 
-function printReport() {
+export function printReport() {
     text = document.getElementById('news').value;
     text = addLineNumber(text)
     playerNameRegex = "([\w+\s*\w*]*)";
