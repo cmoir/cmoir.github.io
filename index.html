@@ -1,5 +1,5 @@
+<!DOCTYPE html>
 <html>
-
 <head>
 	<title>Family News Analyzer</title>
 	<meta name="description" lang="de" content="A tool to sum up and analyse the famnews.">
@@ -8,9 +8,9 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link REL=STYLESHEET HREF="ic.css" TYPE="text/css">
 	<script type="text/javascript">
-	    var occurrence = function (array) {
-        "use strict";
-        var result = {};
+		var occurrence = function (array) {
+			"use strict";
+			var result = {};
 			if (array instanceof Array) { // Check if input is array.
 				array.forEach(function (v, i) {
 					if (!result[v]) { // Initial object property creation.
@@ -21,10 +21,9 @@
 				});
 			}
 			return result;
-		};
-		
-		
-		
+		}
+
+
 		function updateResults() {
 			text = document.getElementById('news').value;
 			text = addLineNumber(text)
@@ -34,27 +33,45 @@
 			lineRegx = "(\d+) ";
 			eventTick = "(\w+)[\s](\d+)T-(\d{1,4})[\s]+";
 			//1 E	T-424		TIF explored planet 4 in the 232,226 system.
+			report = getExploredPlanetSummary(text)
+			//document.getElementById('news').value = report;
+			document.write(report)
+		}
 
+
+		function getExploredPlanetSummary(text) {
+			// 	--------------------
+			// 		Explored   
+			// 	--------------------
+			// 	19 planet(s) Explored #TIF
+			// 	14 planet(s) Explored #Blood Eagle
+			// 	3 planet(s) Explored #sleepy
+			// 	5 planet(s) Explored #Who
+			// 	-------------------
+			// 	41 planet(s) Explored.
+			// return outReport;
 			explorePattern = /(\d+)[\s]E[\s]T-(\d{1,4})\s+([\w+\s*\w*]*) explored planet (\d+) in the (\d+)[,:](\d+) system/gm;
 			matches = text.matchAll(explorePattern);
 			out = ''
-			playerArray = []
+			exploredArray = []
 			if (matches !== null) {
 				for (const match of matches) {
 					out = `${out}${match[1]} turn:${match[2]} player:${match[3]} planet:${match[5]},${match[6]}:${match[4]}\n`
-					playerArray.push(match[3])
+					exploredArray.push(match[3])
 				}
 			}
-
-			counts = occurrence(playerArray)
-			testout = ''
+			counts = occurrence(exploredArray)
+			exploredSummary = '--------------------<br>	Explored<br>--------------------<br>'
+			total = 0
 			if (counts !== null) {
 				for (const player in counts) {
-					testout = `${testout}${player} ${(counts[player].length)}\n`
+					exploredSummary = `${exploredSummary}${(counts[player].length)} planet(s) Explored by ${player}<br>`
+					total = total + counts[player].length
 				}
+				exploredSummary = `${exploredSummary}<br>--------------------<br>${total} planet(s) Explored<br>--------------------`
 			}
+			return exploredSummary
 
-			document.getElementById('news').value = testout;
 		}
 
 		function addLineNumber(text) {
@@ -65,10 +82,9 @@
 				outputWithLineNumbers = `${outputWithLineNumbers}${i} ${lines[line]}\n`
 				i++
 			}
-
 			return outputWithLineNumbers
 		}
-		
+
 
 
 	</script>
@@ -87,7 +103,7 @@
 	Open the family news page, hit CTRL+A on it, CTRL+C and paste it into the field below.<br>
 	<br>
 	<TEXTAREA id="news" name="news" cols=40 rows=5>enter news here</TEXTAREA>
-		<br>
+	<br>
 	<button onclick="updateResults()">Format!</button>
 	<div align=center>
 		<div align=center>
