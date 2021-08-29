@@ -82,7 +82,6 @@ function getCapturedPlanetSummary(text) {
 function getLostPlanetSummary(text) {
     //example
     //EA	T-96		After a brave fight our family member niceguy had to flee the planet planet 13 in the 100,10 system which was attacked by Justin_Bieber of family 6362.
-    //"(?s)"+eventTick+"After a brave fight our family member "+playerNameRegex+" had to flee the planet"+planetRegex+" which was attacked by "+playerNameRegex+" of family (\\d+)+.");
     defeatPattern =/(\d+)[\s]EA[\s]T-(\d{1,4})\s+After a brave fight our family member ([\w+\s*\w*]*) had to flee the planet planet (\d+) in the (\d+)[,:](\d+) system which was attacked by ([\w+\s*\w*]*) of family (\d+)+./gm;
     matches = text.matchAll(defeatPattern);
     capturedFromPlayer = []
@@ -99,10 +98,36 @@ function getLostPlanetSummary(text) {
     defeatSummary = buildReportSection(familyCounts, defeatSummary, 'planet(s) captured by', 'planet(s) lost', false)
 
     playerCounts = occurrence(capturedFromPlayer)
-    defeatSummary = `${capturedSummary}${dashes}Defeats by Player${dashes}`
+    defeatSummary = `${defeatSummary}${dashes}Defeats by Player${dashes}`
     defeatSummary = buildReportSection(playerCounts, defeatSummary, 'planet(s) lost by', 'planet(s) lost', true)
 
 return defeatSummary
+}
+
+function getBlownUpAttacksSummary(text) {
+    //example
+    //SA	T-169		Zanharim attacked Mr_Hinx (6360) on planet 9 in the 68,10 system, and the heavy battle made the planet uninhabitable; an exploration ship will have to be sent there.
+    //Pattern blownSAPattern = Pattern.compile("(?s)"+eventTick+playerNameRegex+" attacked "+playerNameRegex+" .(\\d+). on"+planetRegex+", and the heavy battle made the planet uninhabitable; an exploration ship will have to be sent there.");
+    destroyedPattern =/(\d+)[\s]SA[\s]T-(\d{1,4})\s+([\w+\s*\w*]*) attacked ([\w+\s*\w*]*) .(\d+). on planet (\d+) in the (\d+)[,:](\d+) system, and the heavy battle made the planet uninhabitable; an exploration ship will have to be sent there./gm;
+    matches = text.matchAll(destroyedPattern);
+    destroyedByPlayer = []
+    destroyedFamily = []
+    if (matches !== null) {
+        for (const match of matches) {
+            destroyedByPlayer.push(match[3])
+            destroyedFamily.push(match[5])
+        }
+    }
+
+    familyCounts = occurrence(destroyedFamily)
+    destroyedSummary = `${dashes}Captures blown by family${dashes}`
+    destroyedSummary = buildReportSection(familyCounts, destroyedSummary, 'planet(s) made uninhabitable for', 'planet(s) destroyed', false)
+
+    playerCounts = occurrence(destroyedByPlayer)
+    destroyedSummary = `${destroyedSummary}${dashes}Captures blown by player${dashes}`
+    destroyedSummary = buildReportSection(playerCounts, destroyedSummary, 'planet(s) made uninhabitable by', 'planet(s) destroyed', true)
+    return destroyedSummary
+
 }
 
 function buildReportSection(array, sectionSummary, textLine1, textLine2, includeSummary = true) {
