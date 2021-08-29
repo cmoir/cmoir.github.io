@@ -66,17 +66,43 @@ function getCapturedPlanetSummary(text) {
 
     familyCounts = occurrence(capturedByFamily)
     capturedSummary = `${dashes}Captured from Family${dashes}`
-    capturedSummary = buildReportSection(familyCounts, capturedSummary, 'planet(s) Captured from', 'planet(s) Captured', false)
+    capturedSummary = buildReportSection(familyCounts, capturedSummary, 'planet(s) captured from', 'planet(s) captured', false)
 
     enemyPlayerCounts = occurrence(capturedfromEnemyPlayer)
     capturedSummary = `${capturedSummary}${dashes}Captured from player${dashes}`
-    capturedSummary = buildReportSection(enemyPlayerCounts, capturedSummary, 'planet(s) Captured from', 'planet(s) Captured', false)
+    capturedSummary = buildReportSection(enemyPlayerCounts, capturedSummary, 'planet(s) captured from', 'planet(s) captured', false)
 
     playerCounts = occurrence(capturedByPlayer)
     capturedSummary = `${capturedSummary}${dashes}Captured by player${dashes}`
-    capturedSummary = buildReportSection(playerCounts, capturedSummary, 'planet(s) Captured by', 'planet(s) Captured', true)
+    capturedSummary = buildReportSection(playerCounts, capturedSummary, 'planet(s) captured by', 'planet(s) captured', true)
 
     return capturedSummary
+}
+
+function getLostPlanetSummary(text) {
+    //example
+    //EA	T-96		After a brave fight our family member niceguy had to flee the planet planet 13 in the 100,10 system which was attacked by Justin_Bieber of family 6362.
+    //"(?s)"+eventTick+"After a brave fight our family member "+playerNameRegex+" had to flee the planet"+planetRegex+" which was attacked by "+playerNameRegex+" of family (\\d+)+.");
+    defeatPattern =/(\d+)[\s]EA[\s]T-(\d{1,4})\s+After a brave fight our family member ([\w+\s*\w*]*) had to flee the planet planet (\d+) in the (\d+)[,:](\d+) system which was attacked by ([\w+\s*\w*]*) of family (\d+)+./gm;
+    matches = text.matchAll(defeatPattern);
+    capturedFromPlayer = []
+    capturedByFamily = []
+    if (matches !== null) {
+        for (const match of matches) {
+            capturedFromPlayer.push(match[3])
+            capturedByFamily.push(match[8])
+        }
+    }
+
+    familyCounts = occurrence(capturedByFamily)
+    defeatSummary = `${dashes}Family Defeats${dashes}`
+    defeatSummary = buildReportSection(familyCounts, defeatSummary, 'planet(s) captured by', 'planet(s) lost', false)
+
+    playerCounts = occurrence(capturedFromPlayer)
+    defeatSummary = `${capturedSummary}${dashes}Defeats by Player${dashes}`
+    defeatSummary = buildReportSection(playerCounts, defeatSummary, 'planet(s) lost by', 'planet(s) lost', true)
+
+return defeatSummary
 }
 
 function buildReportSection(array, sectionSummary, textLine1, textLine2, includeSummary = true) {
