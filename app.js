@@ -120,7 +120,7 @@ function getBlownUpAttacksSummary(text) {
     }
 
     familyCounts = occurrence(destroyedFamily)
-    destroyedSummary = `${dashes}Captures blown by family${dashes}`
+    destroyedSummary = `${dashes}Captures blown against family${dashes}`
     destroyedSummary = buildReportSection(familyCounts, destroyedSummary, 'planet(s) made uninhabitable for', 'planet(s) destroyed', false)
 
     playerCounts = occurrence(destroyedByPlayer)
