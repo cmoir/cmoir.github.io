@@ -37,16 +37,18 @@ function getExploredPlanetSummary(text) {
     explorePattern = /(\d+)[\s]E[\s]T-(\d{1,4})\s+([\w+\s*\w*]*) explored planet (\d+) in the (\d+)[,:](\d+) system/gm;
     matches = text.matchAll(explorePattern);
     exploredArray = []
+    exploredPlanetList = []
     if (matches !== null) {
         for (const match of matches) {
             extractAllTheValueForLater = `${match[1]} turn:${match[2]} player:${match[3]} planet:${match[5]},${match[6]}:${match[4]}\n`
             exploredArray.push(match[3])
+            exploredPlanetList.push([match[1], match[2], `${match[5]},${match[6]}:${match[4]}`]) //extract linenumber, turn, planet
         }
     }
     exploredCounts = occurrence(exploredArray)
     exploredSummary = `${dashes}Explored${dashes}`
     exploredSummary = buildReportSection(exploredCounts, exploredSummary, 'planet(s) Explored by', 'planet(s) Explored', true)
-    return exploredSummary
+    return [exploredSummary, exploredPlanetList]
 }
 
 function getCapturedPlanetSummary(text) {
@@ -120,7 +122,7 @@ function getBlownUpCapturesSummary(text) {
         for (const match of matches) {
             destroyedByPlayer.push(match[3])
             destroyedFamily.push(match[5])
-            destroyedPlanetList.push([match[1], match[2], `${match[6]},${match[7]}:${match[5]}`]) //extract linenumber, turn, planet, family
+            destroyedPlanetList.push([match[1], match[2], `${match[6]},${match[7]}:${match[5]}`]) //extract linenumber, turn, planet
         }
     }
 
@@ -136,19 +138,18 @@ function getBlownUpCapturesSummary(text) {
 
 function getBlownUpDefeatsSummary(text) {
     //example
-
     //EA	T-129		An overwhelming force from Mr_Hinx, family 6360 attacked Who's planet 4 in the 93,83 system. The defenders for Who managed to set off a nuclear blast which made the planet uninhabitable.
-    //eventTick+"An overwhelming force from "+playerNameRegex+", family (\\d+) attacked "+playerNameRegex+"'s"+planetRegex+". The defenders for "+playerNameRegex+" managed to set off a nuclear blast which made the planet uninhabitable.");
-    //destroyedDefetsPattern =/(\d+)[\s]EA[\s]T-(\d{1,4})\s+An overwhelming force from ([\w+\s*\w*]*), family (\d+) attacked ([\w+\s*\w*]*)'s planet (\d+) in the (\d+)[,:](\d+) system. The defenders for ([\w+\s*\w*]*) managed to set off a nuclear blast which made the planet uninhabitable./gm;
     destroyedDefetsPattern = /(\d+)[\s]..[\s]T-(\d{1,4})\s+An overwhelming force from ([\w+\s*\w*]*), family (\d+) attacked ([\w+\s*\w*]*).s planet (\d+) in the (\d+)[,:](\d+) system. The defenders for ([\w+\s*\w*]*).*/gm;
 
     matches = text.matchAll(destroyedDefetsPattern);
     destroyedEAByPlayer = []
     destroyedEAFamily = []
+    destroyEAPlanetList = []
     if (matches !== null) {
         for (const match of matches) {
             destroyedEAByPlayer.push(match[5])
             destroyedEAFamily.push(match[4])
+            destroyEAPlanetList.push([match[1], match[2], `${match[7]},${match[8]}:${match[6]}`,match[5]]) //extract linenumber, turn, planet, player
         }
     }
 
@@ -159,7 +160,7 @@ function getBlownUpDefeatsSummary(text) {
     playerCounts = occurrence(destroyedEAByPlayer)
     destroyedEASummary = `${destroyedEASummary}${dashes}Defeats blown by player${dashes}`
     destroyedEASummary = buildReportSection(playerCounts, destroyedEASummary, 'planet(s) made uninhabitable for', 'planet(s) destroyed', true)
-    return destroyedEASummary
+    return [destroyedEASummary, destroyEAPlanetList]
 }
 
 function findOpenRetakes(lostPlanets, capturedPlanets, blownUpCapturesPlanets) {
@@ -192,6 +193,31 @@ function findOpenRetakes(lostPlanets, capturedPlanets, blownUpCapturesPlanets) {
         openRetakeCleanList = `${openRetakeCleanList}${lostPlanets[i][2]}<br>`
     }
     return [openRetakeList, openRetakeCleanList]
+}
+
+    function findOutstandingBlowPLanets(blownUpDefeatsPlanets, exploredPlanetList, capturedPlanets) {
+        blownUpList = `${dashes}List of destroyed planets, not re-explored or retaken${dashes}`
+        match = false
+        for (let i = 0; i < blownUpDefeatsPlanets.length; i++) {
+            for (let j = 0; j < capturedPlanets.length; j++) {
+                if ((blownUpDefeatsPlanets[i][2] === capturedPlanets[j][2]) && (capturedPlanets[j][0] < blownUpDefeatsPlanets[i][0])) {
+                    match = true;
+                    break;
+                }
+            }
+            for (let k = 0; k < exploredPlanetList.length; k++) {
+                if ((blownUpDefeatsPlanets[i][2] === exploredPlanetList[k][2]) && (exploredPlanetList[k][0] < blownUpDefeatsPlanets[i][0])) {
+                    match = true;
+                    break;
+                }
+            }
+            if (!match) {
+                openRetakes.push(blownUpDefeatsPlanets[i])
+                blownUpList = `${blownUpList}${blownUpDefeatsPlanets[i][2]} (${blownUpDefeatsPlanets[i][3]}), lost Tick ${blownUpDefeatsPlanets[i][1]}<br>`
+            }
+            match = false
+        }
+        return [blownUpList]
 
 }
 
