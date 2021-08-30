@@ -187,7 +187,11 @@ function findOpenRetakes(lostPlanets, capturedPlanets, blownUpCapturesPlanets) {
         match = false
     }
     openRetakeList = `${openRetakeList}${dashes}Total Missing ${openRetakes.length}${dashes}`
-    return openRetakeList
+    openRetakeCleanList = `${dashes}Retake List${dashes}`
+    for  (let i = 0; i < openRetakes.length; i++) {
+        openRetakeCleanList = `${openRetakeCleanList}${lostPlanets[i][2]}<br>`
+    }
+    return [openRetakeList, openRetakeCleanList]
 
 }
 

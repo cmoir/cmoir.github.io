@@ -8,7 +8,15 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link REL=STYLESHEET HREF="ic.css" TYPE="text/css">
 	<script type="text/javascript">
-		function printReport() {
+		function printFullReport() {
+			document.write(analise()[0])
+		}
+
+		function printRetakeList() {
+			document.write(analise()[1])
+		}
+		
+		function analise() {
 			text = document.getElementById('news').value;
 			text = addLineNumber(text)
 
@@ -28,9 +36,12 @@
 
 
 			report = report + getBlownUpDefeatsSummary(text)
-			report = report + findOpenRetakes(lostPlanets, capturedPlanets, blownUpCapturesPlanets)
 
-			document.write(report)
+			openRetakeTemp = findOpenRetakes(lostPlanets, capturedPlanets, blownUpCapturesPlanets)
+			openRetakeCleanList = openRetakeTemp[1]
+			report = report + openRetakeTemp[0]
+
+			return([report,openRetakeCleanList])
 		}		
 	</script>
 </head>
@@ -49,7 +60,8 @@
 	<br>
 	<TEXTAREA id="news" name="news" cols=40 rows=5>enter news here</TEXTAREA>
 	<br>
-	<button onclick="printReport()">Format!</button>
+	<button onclick="printFullReport()">Format!</button>
+	<button onclick="printRetakeList()">Retake List</button>
 	<div align=center>
 		<div align=center>
 			<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
