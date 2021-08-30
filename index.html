@@ -14,15 +14,21 @@
 
 			report = getExploredPlanetSummary(text)
 
-			report = report + getCapturedPlanetSummary(text)
+			capturedTemp = getCapturedPlanetSummary(text)
+			report = report + capturedTemp[0]
+			capturedPlanets = capturedTemp[1]
 
 			LostTemp = getLostPlanetSummary(text)
 			report = report + LostTemp[0]
 			lostPlanets = LostTemp[1]
 
-			report = report + getBlownUpAttacksSummary(text)
-			report = report + getBlownUpDefetsSummary(text)
-			report = report + findOpenRetakes(lostPlanets)
+			blownUpCapturesTemp = getBlownUpCapturesSummary(text)
+			report = report + blownUpCapturesTemp[0]
+			blownUpCapturesPlanets = blownUpCapturesTemp[1]
+
+
+			report = report + getBlownUpDefeatsSummary(text)
+			report = report + findOpenRetakes(lostPlanets, capturedPlanets, blownUpCapturesPlanets)
 
 			document.write(report)
 		}		
