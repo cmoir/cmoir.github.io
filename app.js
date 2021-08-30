@@ -56,6 +56,7 @@ function getCapturedPlanetSummary(text) {
     capturedByPlayer = []
     capturedByFamily = []
     capturedfromEnemyPlayer = []
+    capturedPlanets = []
     if (matches !== null) {
         for (const match of matches) {
             capturedByPlayer.push(match[3])
@@ -86,10 +87,13 @@ function getLostPlanetSummary(text) {
     matches = text.matchAll(defeatPattern);
     capturedFromPlayer = []
     capturedByFamily = []
+    lostPlanets = []
     if (matches !== null) {
         for (const match of matches) {
             capturedFromPlayer.push(match[3])
             capturedByFamily.push(match[8])
+            // linenumber, turn, planet, family
+            lostPlanets.push([match[1],match[2],`${match[5]},${match[6]}:${match[4]}`,match[8]])
         }
     }
 
@@ -101,7 +105,7 @@ function getLostPlanetSummary(text) {
     defeatSummary = `${defeatSummary}${dashes}Defeats by Player${dashes}`
     defeatSummary = buildReportSection(playerCounts, defeatSummary, 'planet(s) lost by', 'planet(s) lost', true)
 
-return defeatSummary
+return [defeatSummary, lostPlanets]
 }
 
 function getBlownUpAttacksSummary(text) {
@@ -154,6 +158,16 @@ function getBlownUpDefetsSummary(text) {
     destroyedEASummary = `${destroyedEASummary}${dashes}Defeats blown by player${dashes}`
     destroyedEASummary = buildReportSection(playerCounts, destroyedEASummary, 'planet(s) made uninhabitable for', 'planet(s) destroyed', true)
     return destroyedEASummary
+}
+
+function findOpenRetakes(lostPlanets) {
+    openRetakeList = `${dashes}OPEN RETAKES${dashes}`
+    //97,82:3 (#6360, lost Tick 171)
+    for (let i = 0; i < lostPlanets.length; i++) {
+
+        openRetakeList = `${openRetakeList}${lostPlanets[i][2]} (${lostPlanets[i][3]}), lost Tick ${lostPlanets[i][1]}<br>`
+      }  
+    return openRetakeList
 
 }
 

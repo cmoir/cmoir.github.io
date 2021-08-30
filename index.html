@@ -11,11 +11,19 @@
 		function printReport() {
 			text = document.getElementById('news').value;
 			text = addLineNumber(text)
+
 			report = getExploredPlanetSummary(text)
+
 			report = report + getCapturedPlanetSummary(text)
-			report = report + getLostPlanetSummary(text)
+
+			LostTemp = getLostPlanetSummary(text)
+			report = report + LostTemp[0]
+			lostPlanets = LostTemp[1]
+
 			report = report + getBlownUpAttacksSummary(text)
 			report = report + getBlownUpDefetsSummary(text)
+			report = report + findOpenRetakes(lostPlanets)
+
 			document.write(report)
 		}		
 	</script>
