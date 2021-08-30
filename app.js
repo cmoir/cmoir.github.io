@@ -107,7 +107,6 @@ return defeatSummary
 function getBlownUpAttacksSummary(text) {
     //example
     //SA	T-169		Zanharim attacked Mr_Hinx (6360) on planet 9 in the 68,10 system, and the heavy battle made the planet uninhabitable; an exploration ship will have to be sent there.
-    //Pattern blownSAPattern = Pattern.compile("(?s)"+eventTick+playerNameRegex+" attacked "+playerNameRegex+" .(\\d+). on"+planetRegex+", and the heavy battle made the planet uninhabitable; an exploration ship will have to be sent there.");
     destroyedPattern =/(\d+)[\s]SA[\s]T-(\d{1,4})\s+([\w+\s*\w*]*) attacked ([\w+\s*\w*]*) .(\d+). on planet (\d+) in the (\d+)[,:](\d+) system, and the heavy battle made the planet uninhabitable; an exploration ship will have to be sent there./gm;
     matches = text.matchAll(destroyedPattern);
     destroyedByPlayer = []
@@ -127,6 +126,34 @@ function getBlownUpAttacksSummary(text) {
     destroyedSummary = `${destroyedSummary}${dashes}Captures blown by player${dashes}`
     destroyedSummary = buildReportSection(playerCounts, destroyedSummary, 'planet(s) made uninhabitable by', 'planet(s) destroyed', true)
     return destroyedSummary
+}
+
+function getBlownUpDefetsSummary(text) {
+    //example
+
+    //EA	T-129		An overwhelming force from Mr_Hinx, family 6360 attacked Who's planet 4 in the 93,83 system. The defenders for Who managed to set off a nuclear blast which made the planet uninhabitable.
+    //eventTick+"An overwhelming force from "+playerNameRegex+", family (\\d+) attacked "+playerNameRegex+"'s"+planetRegex+". The defenders for "+playerNameRegex+" managed to set off a nuclear blast which made the planet uninhabitable.");
+    //destroyedDefetsPattern =/(\d+)[\s]EA[\s]T-(\d{1,4})\s+An overwhelming force from ([\w+\s*\w*]*), family (\d+) attacked ([\w+\s*\w*]*)'s planet (\d+) in the (\d+)[,:](\d+) system. The defenders for ([\w+\s*\w*]*) managed to set off a nuclear blast which made the planet uninhabitable./gm;
+    destroyedDefetsPattern =/(\d+)[\s]..[\s]T-(\d{1,4})\s+An overwhelming force from ([\w+\s*\w*]*), family (\d+) attacked ([\w+\s*\w*]*).s planet (\d+) in the (\d+)[,:](\d+) system. The defenders for ([\w+\s*\w*]*).*/gm;
+    
+    matches = text.matchAll(destroyedDefetsPattern);
+    destroyedEAByPlayer = []
+    destroyedEAFamily = []
+    if (matches !== null) {
+        for (const match of matches) {
+            destroyedEAByPlayer.push(match[5])
+            destroyedEAFamily.push(match[4])
+        }
+    }
+
+    familyCounts = occurrence(destroyedEAFamily)
+    destroyedEASummary = `${dashes}Defeats blown by family${dashes}`
+    destroyedEASummary = buildReportSection(familyCounts, destroyedEASummary, 'planet(s) made uninhabitable by', 'planet(s) destroyed', false)
+
+    playerCounts = occurrence(destroyedEAByPlayer)
+    destroyedEASummary = `${destroyedEASummary}${dashes}Defeats blown by player${dashes}`
+    destroyedEASummary = buildReportSection(playerCounts, destroyedEASummary, 'planet(s) made uninhabitable for', 'planet(s) destroyed', true)
+    return destroyedEASummary
 
 }
 
