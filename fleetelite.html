@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='http://fonts.googleapis.com/css?family=Loved+by+the+King' rel='stylesheet' type='text/css'>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap-theme.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />
+    <link href="css/updates.css" rel="stylesheet">
+    <script  type="application/javascript" src="Scripts/jquery-1.8.2.js"></script>
+    <script type="application/javascript" src="Scripts/jquery-ui-1.8.24.js"></script>
+
+    <script type="application/javascript" src="Scripts/modernizr-2.6.2.js"></script>
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
+    <script src="Scripts/bootstrap.min.js"></script>
+
+    <script src="https://gist.github.com/bmschmidt/2f5d3cae74c0c869fafc.js"></script>
+    <title>Fleet Elitist</title>
+</head>
+<body>
+<div data-role="page" id="pgDisclaimer">
+    <div data-role="main" class="ui-content">
+        <h2></h2>
+        <div id="divDisclaimer">To my fellow Partaxiansz who have found this page, I wish a terrific round of hunting.  <br><br>To those from the lesser races (any non-Partaxian), I assume you most likely found this link while surfing for kitten videos or selfies of Justin Beiber.  Although I doubt you have the mental capacity to harm anyone but yourself by using this tool, by clicking the continue button below you agree to not use it to pester any Partaxian.  </div><br>
+        <button><a href="#pgFleet">Continue</a></button>
+    </div>
+</div>
+<div data-role="page" id="pgFleet">
+    <div role="main" class="ui-content">
+        <div class="ui-grid-d">
+            <div class="ui-block-a">
+    <fieldset id="fsFleet" ><legend>1. Fleet</legend>
+        <p>Enter Your Fleet</p>
+        <ul>
+            <li><input  title="Bombers" type="text" id="unit1" value="0" ><img class="fleetImg" src="images/icArt-02.png"></li>
+            <li><input title="Fighters" type="text" id="unit2" value="0"><img class="fleetImg" src="images/icArt-06.png"></li>
+            <li><input title="Soldiers" type="text" id="unit3" value="0"><img class="fleetImg" src="images/icArt-04.png"></li>
+            <li> <input title="Droids" type="text" id="unit5" value="0"><img class="fleetImg" src="images/icArt-05.png"></li>
+            <li><input title="Transports" type="text" id="unit4" value="0"><img class="fleetImg" src="images/icArt-03.png"></li>
+        </ul>
+
+
+    </fieldset>
+            </div>
+
+            <div class="ui-block-b">
+        <fieldset id="fsPlanets" ><legend>2. Planets</legend>
+            <p>Enter The planets to send to</p>
+            <textarea id="tbPlanets" cols="40" ></textarea>
+<button id="btMakeList">Make Links</button>
+
+        </fieldset>
+            </div>
+            <div class="ui-block-c">
+                <fieldset id="fsLinks" ><legend>3. Links</legend>
+                    <p>Click links to launch</p>
+                    <div id="dvFleetLinks"  >
+
+                    </div>
+
+
+                </fieldset></div>
+        </div>
+        <div id="svgHere"></div>
+    </div>
+</div>
+
+
+<script type="application/javascript">
+    var planetList=[];
+    function planetCord(px,py,pnum)
+            {
+        this.planetx=px;
+        this.planety=py;
+        this.planetnum=pnum;
+    };
+    $(document).ready(function(){
+        function checkCords(split) {
+            if(split.length!=3){
+                return false;
+            }
+            for(var i=0;i<split.length;i++){
+                var v=parseInt(split[i]);
+                if(isNaN(v))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        $("#btMakeList").click(function(){
+            var p=$('#tbPlanets').val();
+            var pArray= p.replace(' ','').replace(/\r\n/g,'*').replace(/\n/g,'*').replace(/,/g,':').split('*');
+            checkFleetValues();
+            $('#dvFleetLinks').empty();
+            planetList=[];
+            for(var i= 0; i<pArray.length; i++){
+                try{
+                 if(checkCords(pArray[i].split(':'))){
+                $('#dvFleetLinks').append(makeAttackButton(pArray[i].split(':')));
+                }
+                }catch(exc) {
+         var s="";
+                }
+            }
+            makeMap();
+        });
+        $("#unit3,#unit5").blur(function(){
+            var inputVal=$(this).val();
+            if(parseInt(inputVal)==NaN){
+                $(this).val("0");
+            }else{
+                $(this).val(parseInt(inputVal));
+            }
+            $("#unit4").val(parseInt (((parseInt($("#unit3").val())+parseInt($("#unit4").val())-1)/100)+1 )   );
+        });
+    });
+    function fadebtn(sender)
+    {
+        $(sender).parent().fadeOut(2000);
+      }
+    function makeAttackButton(cords){
+        var planetCs;
+        planetCs = new planetCord(cords[0], cords[1], cords[2]);
+    planetList.push(planetCs );
+       var hrefVal="http://imperialconflict.com/map-backend.php?what=attack&x="+cords[0]+"&y="+cords[1]+"&number="+cords[2]+"&unit1="+$('#unit1').val()+
+                "&unit2="+$('#unit2').val()+"&unit3="+$('#unit3').val()+"&unit4="+$('#unit4').val()+"&unit5="+$('#unit5').val();
+      var bt='<button class="ui-btn ui-shadow ui-corner-all"><a onclick="fadebtn(this)" href="'+hrefVal+'" target="_blank">'+cords[0]+','+cords[1]+':'+cords[2]+'</a></button>';
+        return bt;
+    }
+    function checkFleetValues(){
+     var fleetBoxes=$('#fsFleet input');
+        for(var i =1;i<fleetBoxes.length;i++){
+            if(parseInt(fleetBoxes[i].value)==NaN ){
+                fleetBoxes[i].value="0";
+            }else{
+                fleetBoxes[i].value=parseInt(fleetBoxes[i].value);
+            }
+        }
+    }
+
+    function makeMap(){
+        var width=900;
+        var height=900;
+        var svgMap=d3.select("#svgHere")
+                .append("svg")
+                .attr("width",width)
+                .attr("height",height);
+        svgMap.selectAll("circle")
+                .data(planetList)
+                .enter().append("circle")
+                .style("stroke", "gray")
+                .style("fill", "white")
+                .attr("r", 50)
+                .attr("cx", function(d,i){
+                    return parseInt(d.planetx)+4})
+                .attr("cy", function(d,i){return parseInt(d.planety)+4})
+                .transition().duration(2000).attr("r",4);
+    }
+</script>
+
+</body>

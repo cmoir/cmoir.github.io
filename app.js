@@ -149,7 +149,7 @@ function getBlownUpDefeatsSummary(text) {
         for (const match of matches) {
             destroyedEAByPlayer.push(match[5])
             destroyedEAFamily.push(match[4])
-            destroyEAPlanetList.push([match[1], match[2], `${match[7]},${match[8]}:${match[6]}`,match[5]]) //extract linenumber, turn, planet, player
+            destroyEAPlanetList.push([match[1], match[2], `${match[7]},${match[8]}:${match[6]}`, match[5]]) //extract linenumber, turn, planet, player
         }
     }
 
@@ -189,36 +189,120 @@ function findOpenRetakes(lostPlanets, capturedPlanets, blownUpCapturesPlanets) {
     }
     openRetakeList = `${openRetakeList}${dashes}Total Missing ${openRetakes.length}${dashes}`
     openRetakeCleanList = `${dashes}Retake List${dashes}`
-    for  (let i = 0; i < openRetakes.length; i++) {
+    for (let i = 0; i < openRetakes.length; i++) {
         openRetakeCleanList = `${openRetakeCleanList}${lostPlanets[i][2]}<br>`
     }
     return [openRetakeList, openRetakeCleanList]
 }
 
-    function findOutstandingBlowPLanets(blownUpDefeatsPlanets, exploredPlanetList, capturedPlanets) {
-        blownUpList = `${dashes}List of destroyed planets, not re-explored or retaken${dashes}`
-        match = false
-        for (let i = 0; i < blownUpDefeatsPlanets.length; i++) {
-            for (let j = 0; j < capturedPlanets.length; j++) {
-                if ((blownUpDefeatsPlanets[i][2] === capturedPlanets[j][2]) && (capturedPlanets[j][0] < blownUpDefeatsPlanets[i][0])) {
-                    match = true;
-                    break;
-                }
+function findOutstandingBlowPLanets(blownUpDefeatsPlanets, exploredPlanetList, capturedPlanets) {
+    blownUpList = `${dashes}List of destroyed planets, not re-explored or retaken${dashes}`
+    match = false
+    for (let i = 0; i < blownUpDefeatsPlanets.length; i++) {
+        for (let j = 0; j < capturedPlanets.length; j++) {
+            if ((blownUpDefeatsPlanets[i][2] === capturedPlanets[j][2]) && (capturedPlanets[j][0] < blownUpDefeatsPlanets[i][0])) {
+                match = true;
+                break;
             }
-            for (let k = 0; k < exploredPlanetList.length; k++) {
-                if ((blownUpDefeatsPlanets[i][2] === exploredPlanetList[k][2]) && (exploredPlanetList[k][0] < blownUpDefeatsPlanets[i][0])) {
-                    match = true;
-                    break;
+        }
+        for (let k = 0; k < exploredPlanetList.length; k++) {
+            if ((blownUpDefeatsPlanets[i][2] === exploredPlanetList[k][2]) && (exploredPlanetList[k][0] < blownUpDefeatsPlanets[i][0])) {
+                match = true;
+                break;
+            }
+        }
+        if (!match) {
+            openRetakes.push(blownUpDefeatsPlanets[i])
+            blownUpList = `${blownUpList}${blownUpDefeatsPlanets[i][2]} (${blownUpDefeatsPlanets[i][3]}), lost Tick ${blownUpDefeatsPlanets[i][1]}<br>`
+        }
+        match = false
+    }
+    return [blownUpList]
+
+}
+
+function getAidSummary(text) {
+    resources = ['Cash', 'Endurium', 'Food', 'Iron', 'Octarine']
+    playerList = []
+
+    //get all the aid info add to aidSummaryArray
+    aidPattern1 = /(\d+)[\s]A[\s]T-(\d{1,4})\s+In the name of family cooperation ([\w+\s*\w*]*) has sent a shipment of (\d+) (\w+) .*to ([\w+\s*\w*]*)./gm;
+    aidPattern2 = /(\d+)[\s]A[\s]T-(\d{1,4})\s+In the name of family cooperation ([\w+\s*\w*]*) has sent a shipment of \d+ \w+ (\d+) (\w+) .*to ([\w+\s*\w*]*)./gm;
+    aidPattern3 = /(\d+)[\s]A[\s]T-(\d{1,4})\s+In the name of family cooperation ([\w+\s*\w*]*) has sent a shipment of \d+ \w+ \d+ \w+ (\d+) (\w+) .*to ([\w+\s*\w*]*)./gm;
+    aidPattern4 = /(\d+)[\s]A[\s]T-(\d{1,4})\s+In the name of family cooperation ([\w+\s*\w*]*) has sent a shipment of \d+ \w+ \d+ \w+ \d+ \w+ (\d+) (\w+) .*to ([\w+\s*\w*]*)./gm;
+    aidPattern5 = /(\d+)[\s]A[\s]T-(\d{1,4})\s+In the name of family cooperation ([\w+\s*\w*]*) has sent a shipment of \d+ \w+ \d+ \w+ \d+ \w+ \d+ \w+ (\d+) (\w+) to ([\w+\s*\w*]*)./gm;
+    aidSummmaryArray = []
+    aidPattern1Matches = text.matchAll(aidPattern1);
+    if (aidPattern1Matches !== null) {
+        for (const match of aidPattern1Matches) {
+            aidSummmaryArray.push([match[3], match[6], match[4], match[5]]) //extract: sending player, receiving player, amount, resource
+        }
+    }
+    aidPattern2Matches = text.matchAll(aidPattern2);
+    if (aidPattern2Matches !== null) {
+        for (const match of aidPattern2Matches) {
+            aidSummmaryArray.push([match[3], match[6], match[4], match[5]]) 
+        }
+    }
+    aidPattern3Matches = text.matchAll(aidPattern3);
+    if (aidPattern3Matches !== null) {
+        for (const match of aidPattern3Matches) {
+            aidSummmaryArray.push([match[3], match[6], match[4], match[5]]) 
+        }
+    }
+    aidPattern4Matches = text.matchAll(aidPattern4);
+    if (aidPattern4Matches !== null) {
+        for (const match of aidPattern4Matches) {
+            aidSummmaryArray.push([match[3], match[6], match[4], match[5]])
+        }
+    }
+    aidPattern5Matches = text.matchAll(aidPattern5);
+    if (aidPattern5Matches !== null) {
+        for (const match of aidPattern5Matches) {
+            aidSummmaryArray.push([match[3], match[6], match[4], match[5]]) 
+        }
+    }
+
+    //get player list
+    for (item in aidSummmaryArray) {
+        if (playerList.length == 0) {
+            playerList.push(aidSummmaryArray[item][0])
+        }
+        else {
+            for (player in playerList) {
+                if (aidSummmaryArray[item][0] == playerList[player]) {                    
+                    match = true
                 }
+                else if (aidSummmaryArray[item][3] == playerList[player])
+                {match = true}
             }
             if (!match) {
-                openRetakes.push(blownUpDefeatsPlanets[i])
-                blownUpList = `${blownUpList}${blownUpDefeatsPlanets[i][2]} (${blownUpDefeatsPlanets[i][3]}), lost Tick ${blownUpDefeatsPlanets[i][1]}<br>`
+                playerList.push(aidSummmaryArray[item][0])
             }
             match = false
         }
-        return [blownUpList]
+    }
+    //resources = ['Cash', 'Endurium', 'Food', 'Iron', 'Octarine']
+    sendAidArray = {}
+    //build dict with array of 0 values with player lookpup
+    for (player in playerList){
+        sendAidArray[playerList[player]] = [0, 0, 0, 0, 0]
+    }
+    console.log(aidSummmaryArray[item][0])
 
+
+    for (item in aidSummmaryArray) {
+        if (aidSummmaryArray[item][3] == 'Cash')
+        {
+            player = aidSummmaryArray[item][0]
+            currentAmount = sendAidArray[player][0];
+            sendAidArray[player][0] = Number(currentAmount)+Number(aidSummmaryArray[item][2])
+        }
+    }
+    console.log(sendAidArray)
+
+    aidSummary = `${dashes}Aid Sent${dashes}`
+    return aidSummary
 }
 
 function buildReportSection(array, sectionSummary, textLine1, textLine2, includeSummary = true) {
@@ -234,3 +318,5 @@ function buildReportSection(array, sectionSummary, textLine1, textLine2, include
     }
     return sectionSummary
 }
+
+class AidSummary { }

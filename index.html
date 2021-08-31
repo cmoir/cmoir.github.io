@@ -44,6 +44,7 @@
 			openRetakeCleanList = openRetakeTemp[1]
 			report = report + openRetakeTemp[0]
 			report = report + findOutstandingBlowPLanets(blownUpDefeatsPlanets, exploredPlanetList, capturedPlanets)
+			report = report + getAidSummary(text)
 			return([report,openRetakeCleanList])
 		}		
 	</script>
