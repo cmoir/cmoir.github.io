@@ -290,7 +290,6 @@ function getAidSummary(text) {
     }
     console.log(aidSummmaryArray[item][0])
 
-
     for (item in aidSummmaryArray) {
         switch (aidSummmaryArray[item][3]) {
             case 'Cash':
@@ -322,24 +321,24 @@ function getAidSummary(text) {
                 console.log(`New resource ${aidSummmaryArray[item][3]} added to the game?`);
         }
     }
-        console.log(sendAidArray)
+    console.log(sendAidArray)
 
-        aidSummary = `${dashes}Aid Sent${dashes}`
-        return aidSummary
-    }
+    aidSummary = `${dashes}Aid Sent${dashes}`
+    return aidSummary
+}
 
-    function buildReportSection(array, sectionSummary, textLine1, textLine2, includeSummary = true) {
-        total = 0
-        if (array !== null) {
-            for (const item in array) {
-                sectionSummary = `${sectionSummary}${(array[item].length)} ${textLine1} ${item}<br>`
-                total = total + array[item].length
-            }
-            if (includeSummary) {
-                sectionSummary = `${sectionSummary}${dashes}${total} ${textLine2}${dashes}`
-            }
+function buildReportSection(array, sectionSummary, textLine1, textLine2, includeSummary = true) {
+    total = 0
+    if (array !== null) {
+        for (const item in array) {
+            sectionSummary = `${sectionSummary}${(array[item].length)} ${textLine1} ${item}<br>`
+            total = total + array[item].length
         }
-        return sectionSummary
+        if (includeSummary) {
+            sectionSummary = `${sectionSummary}${dashes}${total} ${textLine2}${dashes}`
+        }
     }
+    return sectionSummary
+}
 
-    class AidSummary { }
+class AidSummary { }
