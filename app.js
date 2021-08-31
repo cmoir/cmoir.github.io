@@ -241,13 +241,13 @@ function getAidSummary(text) {
     aidPattern2Matches = text.matchAll(aidPattern2);
     if (aidPattern2Matches !== null) {
         for (const match of aidPattern2Matches) {
-            aidSummmaryArray.push([match[3], match[6], match[4], match[5]]) 
+            aidSummmaryArray.push([match[3], match[6], match[4], match[5]])
         }
     }
     aidPattern3Matches = text.matchAll(aidPattern3);
     if (aidPattern3Matches !== null) {
         for (const match of aidPattern3Matches) {
-            aidSummmaryArray.push([match[3], match[6], match[4], match[5]]) 
+            aidSummmaryArray.push([match[3], match[6], match[4], match[5]])
         }
     }
     aidPattern4Matches = text.matchAll(aidPattern4);
@@ -259,7 +259,7 @@ function getAidSummary(text) {
     aidPattern5Matches = text.matchAll(aidPattern5);
     if (aidPattern5Matches !== null) {
         for (const match of aidPattern5Matches) {
-            aidSummmaryArray.push([match[3], match[6], match[4], match[5]]) 
+            aidSummmaryArray.push([match[3], match[6], match[4], match[5]])
         }
     }
 
@@ -270,11 +270,10 @@ function getAidSummary(text) {
         }
         else {
             for (player in playerList) {
-                if (aidSummmaryArray[item][0] == playerList[player]) {                    
+                if (aidSummmaryArray[item][0] == playerList[player]) {
                     match = true
                 }
-                else if (aidSummmaryArray[item][3] == playerList[player])
-                {match = true}
+                else if (aidSummmaryArray[item][3] == playerList[player]) { match = true }
             }
             if (!match) {
                 playerList.push(aidSummmaryArray[item][0])
@@ -285,38 +284,62 @@ function getAidSummary(text) {
     //resources = ['Cash', 'Endurium', 'Food', 'Iron', 'Octarine']
     sendAidArray = {}
     //build dict with array of 0 values with player lookpup
-    for (player in playerList){
+    for (player in playerList) {
         sendAidArray[playerList[player]] = [0, 0, 0, 0, 0]
+        receivedAidArray[playerList[player]] = [0, 0, 0, 0, 0]
     }
     console.log(aidSummmaryArray[item][0])
 
 
     for (item in aidSummmaryArray) {
-        if (aidSummmaryArray[item][3] == 'Cash')
-        {
-            player = aidSummmaryArray[item][0]
-            currentAmount = sendAidArray[player][0];
-            sendAidArray[player][0] = Number(currentAmount)+Number(aidSummmaryArray[item][2])
+        switch (aidSummmaryArray[item][3]) {
+            case 'Cash':
+                player = aidSummmaryArray[item][0]
+                currentAmount = sendAidArray[player][0];
+                sendAidArray[player][0] = Number(currentAmount) + Number(aidSummmaryArray[item][2])
+                break;
+            case 'Endurium':
+                player = aidSummmaryArray[item][0]
+                currentAmount = sendAidArray[player][1];
+                sendAidArray[player][1] = Number(currentAmount) + Number(aidSummmaryArray[item][2])
+                break;
+            case 'Food':
+                player = aidSummmaryArray[item][0]
+                currentAmount = sendAidArray[player][2];
+                sendAidArray[player][2] = Number(currentAmount) + Number(aidSummmaryArray[item][2])
+                break;
+            case 'Iron':
+                player = aidSummmaryArray[item][0]
+                currentAmount = sendAidArray[player][3];
+                sendAidArray[player][3] = Number(currentAmount) + Number(aidSummmaryArray[item][2])
+                break;
+            case 'Octarine':
+                player = aidSummmaryArray[item][0]
+                currentAmount = sendAidArray[player][4];
+                sendAidArray[player][4] = Number(currentAmount) + Number(aidSummmaryArray[item][2])
+                break;
+            default:
+                console.log(`New resource ${aidSummmaryArray[item][3]} added to the game?`);
         }
     }
-    console.log(sendAidArray)
+        console.log(sendAidArray)
 
-    aidSummary = `${dashes}Aid Sent${dashes}`
-    return aidSummary
-}
-
-function buildReportSection(array, sectionSummary, textLine1, textLine2, includeSummary = true) {
-    total = 0
-    if (array !== null) {
-        for (const item in array) {
-            sectionSummary = `${sectionSummary}${(array[item].length)} ${textLine1} ${item}<br>`
-            total = total + array[item].length
-        }
-        if (includeSummary) {
-            sectionSummary = `${sectionSummary}${dashes}${total} ${textLine2}${dashes}`
-        }
+        aidSummary = `${dashes}Aid Sent${dashes}`
+        return aidSummary
     }
-    return sectionSummary
-}
 
-class AidSummary { }
+    function buildReportSection(array, sectionSummary, textLine1, textLine2, includeSummary = true) {
+        total = 0
+        if (array !== null) {
+            for (const item in array) {
+                sectionSummary = `${sectionSummary}${(array[item].length)} ${textLine1} ${item}<br>`
+                total = total + array[item].length
+            }
+            if (includeSummary) {
+                sectionSummary = `${sectionSummary}${dashes}${total} ${textLine2}${dashes}`
+            }
+        }
+        return sectionSummary
+    }
+
+    class AidSummary { }
