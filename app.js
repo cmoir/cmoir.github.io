@@ -128,11 +128,11 @@ function getBlownUpCapturesSummary(text) {
 
     familyCounts = occurrence(destroyedFamily)
     destroyedSummary = `${dashes}Captures blown against family${dashes}`
-    destroyedSummary = buildReportSection(familyCounts, destroyedSummary, 'planet(s) made uninhabitable for', 'planet(s) destroyed', false)
+    destroyedSummary = buildReportSection(familyCounts, destroyedSummary, 'planet(s) made uninhabitable for', 'planet(s) Captures blown up', false)
 
     playerCounts = occurrence(destroyedByPlayer)
     destroyedSummary = `${destroyedSummary}${dashes}Captures blown by player${dashes}`
-    destroyedSummary = buildReportSection(playerCounts, destroyedSummary, 'planet(s) made uninhabitable by', 'planet(s) destroyed', true)
+    destroyedSummary = buildReportSection(playerCounts, destroyedSummary, 'planet(s) made uninhabitable by', 'planet(s) Defeats blown up', true)
     return [destroyedSummary, destroyedPlanetList]
 }
 
@@ -263,6 +263,10 @@ function getAidSummary(text) {
         }
     }
 
+    if (aidSummmaryArray === []) {
+        //exit aid section, no aid records in news
+        return `${dashes}Not Aid Sent or Received${dashes}`
+    }
     //get player list
     for (item in aidSummmaryArray) {
         if (playerList.length == 0) {
@@ -283,12 +287,12 @@ function getAidSummary(text) {
     }
     //resources = ['Cash', 'Endurium', 'Food', 'Iron', 'Octarine']
     sendAidArray = {}
+    receivedAidArray = {}
     //build dict with array of 0 values with player lookpup
     for (player in playerList) {
         sendAidArray[playerList[player]] = [0, 0, 0, 0, 0]
         receivedAidArray[playerList[player]] = [0, 0, 0, 0, 0]
     }
-    console.log(aidSummmaryArray[item][0])
 
     for (item in aidSummmaryArray) {
         switch (aidSummmaryArray[item][3]) {
@@ -296,34 +300,67 @@ function getAidSummary(text) {
                 player = aidSummmaryArray[item][0]
                 currentAmount = sendAidArray[player][0];
                 sendAidArray[player][0] = Number(currentAmount) + Number(aidSummmaryArray[item][2])
+
+                playerReceived = aidSummmaryArray[item][1]
+                currentAmount = receivedAidArray[playerReceived][0];
+                receivedAidArray[playerReceived][0] = Number(currentAmount) + Number(aidSummmaryArray[item][2])
                 break;
             case 'Endurium':
                 player = aidSummmaryArray[item][0]
                 currentAmount = sendAidArray[player][1];
                 sendAidArray[player][1] = Number(currentAmount) + Number(aidSummmaryArray[item][2])
+
+                playerReceived = aidSummmaryArray[item][1]
+                currentAmount = receivedAidArray[playerReceived][1];
+                receivedAidArray[playerReceived][1] = Number(currentAmount) + Number(aidSummmaryArray[item][2])
                 break;
             case 'Food':
                 player = aidSummmaryArray[item][0]
                 currentAmount = sendAidArray[player][2];
                 sendAidArray[player][2] = Number(currentAmount) + Number(aidSummmaryArray[item][2])
+
+                playerReceived = aidSummmaryArray[item][1]
+                currentAmount = receivedAidArray[playerReceived][2];
+                receivedAidArray[playerReceived][2] = Number(currentAmount) + Number(aidSummmaryArray[item][2])
                 break;
             case 'Iron':
                 player = aidSummmaryArray[item][0]
                 currentAmount = sendAidArray[player][3];
                 sendAidArray[player][3] = Number(currentAmount) + Number(aidSummmaryArray[item][2])
+
+                playerReceived = aidSummmaryArray[item][1]
+                currentAmount = receivedAidArray[playerReceived][3];
+                receivedAidArray[playerReceived][3] = Number(currentAmount) + Number(aidSummmaryArray[item][2])
                 break;
             case 'Octarine':
                 player = aidSummmaryArray[item][0]
                 currentAmount = sendAidArray[player][4];
                 sendAidArray[player][4] = Number(currentAmount) + Number(aidSummmaryArray[item][2])
+
+                playerReceived = aidSummmaryArray[item][1]
+                currentAmount = receivedAidArray[playerReceived][4];
+                receivedAidArray[playerReceived][4] = Number(currentAmount) + Number(aidSummmaryArray[item][2])
                 break;
             default:
                 console.log(`New resource ${aidSummmaryArray[item][3]} added to the game?`);
         }
     }
-    console.log(sendAidArray)
 
     aidSummary = `${dashes}Aid Sent${dashes}`
+
+    for (player in sendAidArray) {
+        //resources = ['Cash', 'Endurium', 'Food', 'Iron', 'Octarine']
+        aidSummary = aidSummary + `${player} sent ${sendAidArray[player][0]} Cash, ${sendAidArray[player][1]} Endurium, ${sendAidArray[player][2]} Food, ${sendAidArray[player][3]} Iron, ${sendAidArray[player][4]} Octarine<br>`
+    }
+
+    aidSummary = aidSummary + `${dashes}Aid Received${dashes}`
+
+    for (player in receivedAidArray) {
+        //resources = ['Cash', 'Endurium', 'Food', 'Iron', 'Octarine']
+        aidSummary = aidSummary + `${player} sent ${receivedAidArray[player][0]} Cash, ${receivedAidArray[player][1]} Endurium, ${receivedAidArray[player][2]} Food, ${receivedAidArray[player][3]} Iron, ${receivedAidArray[player][4]} Octarine<br>`
+    }
+
+
     return aidSummary
 }
 
