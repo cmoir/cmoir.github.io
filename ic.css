@@ -4,14 +4,6 @@ font-family: Verdana;
 font-size: 12px;
 }	
 
-TD.dotted
-{
-font-family: Verdana;
-font-size: 12px;
-border-left: 1px dotted #000000;
-border-bottom: 1px dotted #000000;
-}	
-
 TD.bar
 {
 font-family: Verdana;

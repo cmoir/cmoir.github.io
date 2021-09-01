@@ -1,5 +1,6 @@
 dashes = '<br>--------------------<br>'
 doc = '<!DOCTYPE html><html><head><link REL=STYLESHEET HREF="ic.css" TYPE="text/css"></head><body>'
+playerList = []
 
 
 function occurrence(array) {
@@ -226,8 +227,7 @@ function findOutstandingBlowPLanets(blownUpDefeatsPlanets, exploredPlanetList, c
 }
 
 function getAidSummary(text) {
-    resources = ['Cash', 'Endurium', 'Food', 'Iron', 'Octarine']
-    playerList = []
+    resources = ['Cash', 'Endurium', 'Food', 'Iron', 'Octarine']    
 
     //get all the aid info add to aidSummaryArray
     aidPattern1 = /(\d+)[\s]A[\s]T-(\d{1,4})\s+In the name of family cooperation ([\w+\s*\w*]*) has sent a shipment of (\d+) (\w+) .*to ([\w+\s*\w*]*)./gm;
@@ -272,23 +272,8 @@ function getAidSummary(text) {
         return `${dashes}Not Aid Sent or Received${dashes}`
     }
     //get player list
-    for (item in aidSummmaryArray) {
-        if (playerList.length == 0) {
-            playerList.push(aidSummmaryArray[item][0])
-        }
-        else {
-            for (player in playerList) {
-                if (aidSummmaryArray[item][0] == playerList[player]) {
-                    match = true
-                }
-                else if (aidSummmaryArray[item][3] == playerList[player]) { match = true }
-            }
-            if (!match) {
-                playerList.push(aidSummmaryArray[item][0])
-            }
-            match = false
-        }
-    }
+    getPlayerNames(aidSummmaryArray, 0);
+    getPlayerNames(aidSummmaryArray, 3);
     //resources = ['Cash', 'Endurium', 'Food', 'Iron', 'Octarine']
     sendAidArray = {}
     receivedAidArray = {}
@@ -387,6 +372,26 @@ function getAidSummary(text) {
 
     aidSummary = `${aidSummary}</table></body>`
     return aidSummary
+}
+
+function getPlayerNames(array,playerIndex) {
+    for (item in array) {
+        if (playerList.length == 0) {
+            playerList.push(array[item][0]);
+        }
+        else {
+            for (player in playerList) {
+                if (array[item][0] == playerList[player]) {
+                    match = true;
+                }
+            }
+            if (!match) {
+                playerList.push(array[item][0]);
+            }
+            match = false;
+        }
+    }
+    return playerList
 }
 
 function buildReportSection(array, sectionSummary, textLine1, textLine2, includeSummary = true) {
