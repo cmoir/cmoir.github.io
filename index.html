@@ -13,7 +13,8 @@
 		}
 
 		function printRetakeList() {
-			document.write(analyse()[1])
+			document.getElementById('news').value = analyse()[1];
+			//document.write(analyse()[1])
 		}
 		
 		function analyse() {
@@ -62,10 +63,11 @@
 	<h3>family news analyzer</h3>
 	Open the family news page, hit CTRL+A on it, CTRL+C and paste it into the field below.<br>
 	<br>
-	<TEXTAREA id="news" name="news" cols=40 rows=5>enter news here</TEXTAREA>
+	<TEXTAREA id="news" name="news" cols=40 rows=5></TEXTAREA>
 	<br>
 	<button onclick="printFullReport()">Format!</button>
 	<button onclick="printRetakeList()">Retake List</button>
+	<button onclick="copyToClipboard('news')">Copy</button>
 	<div align=center>
 		<div align=center>
 			<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>

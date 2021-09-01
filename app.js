@@ -193,9 +193,9 @@ function findOpenRetakes(lostPlanets, capturedPlanets, blownUpCapturesPlanets) {
         match = false
     }
     openRetakeList = `${openRetakeList}${dashes}Total Missing ${openRetakes.length}${dashes}`
-    openRetakeCleanList = `${dashes}Retake List${dashes}`
+    openRetakeCleanList = ''
     for (let i = 0; i < openRetakes.length; i++) {
-        openRetakeCleanList = `${openRetakeCleanList}${lostPlanets[i][2]}<br>`
+        openRetakeCleanList = `${openRetakeCleanList}${lostPlanets[i][2]}\n`
     }
     return [openRetakeList, openRetakeCleanList]
 }
@@ -406,4 +406,13 @@ function buildReportSection(array, sectionSummary, textLine1, textLine2, include
         }
     }
     return sectionSummary
+}
+
+function copyToClipboard(id) {
+    var copyText = document.getElementById(id);
+    /* Select the text field */
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); /* For mobile devices */
+    /* Copy the text inside the text field */
+    navigator.clipboard.writeText(copyText.value);
 }
