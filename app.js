@@ -1,4 +1,6 @@
 dashes = '<br>--------------------<br>'
+doc = '<!DOCTYPE html><html><head><link REL=STYLESHEET HREF="ic.css" TYPE="text/css"></head><body>'
+
 
 function occurrence(array) {
     var result = {};
@@ -31,6 +33,7 @@ function addLineNumber(text) {
     return outputWithLineNumbers
 }
 
+
 function getExploredPlanetSummary(text) {
     //explored text example
     //1 E	T-424		TIF explored planet 4 in the 232,226 system.
@@ -45,8 +48,9 @@ function getExploredPlanetSummary(text) {
             exploredPlanetList.push([match[1], match[2], `${match[5]},${match[6]}:${match[4]}`]) //extract linenumber, turn, planet
         }
     }
+
     exploredCounts = occurrence(exploredArray)
-    exploredSummary = `${dashes}Explored${dashes}`
+    exploredSummary = `${doc}${dashes}Explored${dashes}`
     exploredSummary = buildReportSection(exploredCounts, exploredSummary, 'planet(s) Explored by', 'planet(s) Explored', true)
     return [exploredSummary, exploredPlanetList]
 }
@@ -346,21 +350,42 @@ function getAidSummary(text) {
         }
     }
 
-    aidSummary = `${dashes}Aid Sent${dashes}`
-
+    aidSummary = 
+    `   <br>
+        <table border = "1">
+            <tr>
+                <th colspan = "6">Aid Sent</th>
+            </tr>
+            <th>Player</th><th>Cash</th><th>Endurium</th><th>Food</th><th>Iron</th><th>Octarine</th>
+            <tr>`
     for (player in sendAidArray) {
-        //resources = ['Cash', 'Endurium', 'Food', 'Iron', 'Octarine']
-        aidSummary = aidSummary + `${player} sent ${sendAidArray[player][0]} Cash, ${sendAidArray[player][1]} Endurium, ${sendAidArray[player][2]} Food, ${sendAidArray[player][3]} Iron, ${sendAidArray[player][4]} Octarine<br>`
+        aidSummary = `${aidSummary}<td>${player}</td><td>${sendAidArray[player][0]}</td><td>${sendAidArray[player][1]}</td><td>${sendAidArray[player][2]}</td><td>${sendAidArray[player][3]}</td><td>${sendAidArray[player][4]}</td></tr>`
     }
+    
 
-    aidSummary = aidSummary + `${dashes}Aid Received${dashes}`
+    // for (player in sendAidArray) {
+    //     //resources = ['Cash', 'Endurium', 'Food', 'Iron', 'Octarine']
+    //     aidSummary = aidSummary + `${player} sent ${sendAidArray[player][0]} Cash, ${sendAidArray[player][1]} Endurium, ${sendAidArray[player][2]} Food, ${sendAidArray[player][3]} Iron, ${sendAidArray[player][4]} Octarine<br>`
+    // }
+   // aidSummary = aidSummary + `${dashes}Aid Received${dashes}`
+    aidSummary =`${aidSummary}</table> <br>
+    <table border = "1">
+        <tr>
+            <th colspan = "6">Aid Received</th>
+        </tr>
+        <th>Player</th><th>Cash</th><th>Endurium</th><th>Food</th><th>Iron</th><th>Octarine</th>
+        <tr>`
 
     for (player in receivedAidArray) {
-        //resources = ['Cash', 'Endurium', 'Food', 'Iron', 'Octarine']
-        aidSummary = aidSummary + `${player} sent ${receivedAidArray[player][0]} Cash, ${receivedAidArray[player][1]} Endurium, ${receivedAidArray[player][2]} Food, ${receivedAidArray[player][3]} Iron, ${receivedAidArray[player][4]} Octarine<br>`
+        aidSummary = `${aidSummary}<td>${player}</td><td>${receivedAidArray[player][0]}</td><td>${receivedAidArray[player][1]}</td><td>${receivedAidArray[player][2]}</td><td>${receivedAidArray[player][3]}</td><td>${receivedAidArray[player][4]}</td></tr>`
     }
 
+    // for (player in receivedAidArray) {
+    //     //resources = ['Cash', 'Endurium', 'Food', 'Iron', 'Octarine']
+    //     aidSummary = aidSummary + `${player} sent ${receivedAidArray[player][0]} Cash, ${receivedAidArray[player][1]} Endurium, ${receivedAidArray[player][2]} Food, ${receivedAidArray[player][3]} Iron, ${receivedAidArray[player][4]} Octarine<br>`
+    // }
 
+    aidSummary = `${aidSummary}</table></body>`
     return aidSummary
 }
 
@@ -377,5 +402,3 @@ function buildReportSection(array, sectionSummary, textLine1, textLine2, include
     }
     return sectionSummary
 }
-
-class AidSummary { }
