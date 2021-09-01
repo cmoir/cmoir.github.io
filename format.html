@@ -8,11 +8,13 @@
 	<link REL=STYLESHEET HREF="ic.css" TYPE="text/css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 	<script type="text/javascript">
-		function copyToClipboard(element) {
-			var text = $(element).clone().find('br').prepend('\r\n').end().text();
-			element = $('<textarea>').appendTo('body').val(text).select();
-			document.execCommand('copy');
-			element.remove();
+		function copyToClipboard() {
+			var copyText = document.getElementById("planetList");
+			/* Select the text field */
+			copyText.select();
+			copyText.setSelectionRange(0, 99999); /* For mobile devices */
+			/* Copy the text inside the text field */
+			navigator.clipboard.writeText(copyText.value);
 		}
 		function updateResults() {
 			//82,98:10
@@ -73,7 +75,7 @@
 		<BR>
 	</P>
 	<button onclick="updateResults()">format</button>
-	<button onclick="copyToClipboard('#planetList')">Copy</button>
+	<button onclick="copyToClipboard()">Copy</button>
 
 
 	<hr>

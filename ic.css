@@ -4,14 +4,6 @@ font-family: Verdana;
 font-size: 12px;
 }	
 
-TD.dotted
-{
-font-family: Verdana;
-font-size: 12px;
-border-left: 1px dotted #000000;
-border-bottom: 1px dotted #000000;
-}	
-
 TD.bar
 {
 font-family: Verdana;
@@ -55,7 +47,7 @@ border: 0px;
 }
 Table.bar
 {
-border: 0px;
+border: 4px;
 padding: 0;
 }
 
@@ -89,4 +81,14 @@ font-weight:bold;
 
 .small {
   font-size:8px;
+}
+table {
+	border-collapse: collapse;
+}
+
+table, th, td {
+	border: 1px black solid;
+}
+tr:nth-child(even) {
+	background-color: lightgray;
 }
