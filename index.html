@@ -17,37 +17,6 @@
 			//document.write(analyse()[1])
 		}
 		
-		function analyse() {
-			text = document.getElementById('news').value;
-			text = addLineNumber(text)
-
-			exploredTemp = getExploredPlanetSummary(text)
-			exploredPlanetList = exploredTemp[1]
-			report = exploredTemp[0]
-
-			capturedTemp = getCapturedPlanetSummary(text)
-			report = report + capturedTemp[0]
-			capturedPlanets = capturedTemp[1]
-
-			LostTemp = getLostPlanetSummary(text)
-			report = report + LostTemp[0]
-			lostPlanets = LostTemp[1]
-
-			blownUpCapturesTemp = getBlownUpCapturesSummary(text)
-			report = report + blownUpCapturesTemp[0]
-			blownUpCapturesPlanets = blownUpCapturesTemp[1]
-
-			blownUpDefeatsTemp = getBlownUpDefeatsSummary(text)
-			report = report + blownUpDefeatsTemp[0]
-			blownUpDefeatsPlanets = blownUpDefeatsTemp[1]
-
-			openRetakeTemp = findOpenRetakes(lostPlanets, capturedPlanets, blownUpCapturesPlanets)
-			openRetakeCleanList = openRetakeTemp[1]
-			report = report + openRetakeTemp[0]
-			report = report + findOutstandingBlowPLanets(blownUpDefeatsPlanets, exploredPlanetList, capturedPlanets)
-			report = report + getAidSummary(text)
-			return([report,openRetakeCleanList])
-		}		
 	</script>
 </head>
 
