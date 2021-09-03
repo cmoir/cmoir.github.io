@@ -1,7 +1,10 @@
 dashes = "<br>--------------------<br>";
 doc =
   '<!DOCTYPE html><html><head><link REL=STYLESHEET HREF="ic.css" TYPE="text/css"></head><body>';
-const playerList = new Set();
+var playerList = new Set();
+var capturedPanetsArray = [];
+var planetsArray = [];
+var byPlayerDict = {};
 
 function analyse() {
   text = document.getElementById("news").value;
@@ -55,8 +58,8 @@ function addLineNumber(text) {
   lines = text.split("\n");
   outputWithLineNumbers = "";
   i = 1;
-  for (line in lines) {
-    outputWithLineNumbers = `${outputWithLineNumbers}${i} ${lines[line]}\n`;
+  for (line of lines) {
+    outputWithLineNumbers = `${outputWithLineNumbers}${i} ${line}\n`;
     i++;
   }
   return outputWithLineNumbers;
@@ -112,7 +115,8 @@ function getCapturedPlanetSummary(text) {
         match[1],
         match[2],
         `${match[5]},${match[6]}:${match[4]}`,
-      ]); // extract linenumber, turn, planet
+      ]);
+      player = match[2];
     }
   }
 
@@ -127,6 +131,7 @@ function getCapturedPlanetSummary(text) {
   );
 
   enemyPlayerCounts = occurrence(capturedfromEnemyPlayer);
+
   capturedSummary = `${capturedSummary}${dashes}Captured from player${dashes}`;
   capturedSummary = buildReportSection(
     enemyPlayerCounts,
@@ -137,14 +142,20 @@ function getCapturedPlanetSummary(text) {
   );
 
   playerCounts = occurrence(capturedByPlayer);
-  capturedSummary = `${capturedSummary}${dashes}Captured by player${dashes}`;
-  capturedSummary = buildReportSection(
-    playerCounts,
-    capturedSummary,
-    "planet(s) captured by",
-    "planet(s) captured",
-    true
-  );
+//   capturedSummary = `${capturedSummary}${dashes}Captured by player${dashes}`;
+//   capturedSummary = buildReportSection(
+//     playerCounts,
+//     capturedSummary,
+//     "planet(s) captured by",
+//     "planet(s) captured",
+//     true
+//   );
+  //add values to summary table
+  // addPlayerNames(playerCounts, 0);
+  for (const player in playerCounts) {
+    playerList.add(player);
+    byPlayerDict[player] = [playerCounts[player].length, 0, 0, 0];
+  }
 
   return [capturedSummary, capturedPlanetsList];
 }
@@ -182,14 +193,28 @@ function getLostPlanetSummary(text) {
   );
 
   playerCounts = occurrence(capturedFromPlayer);
-  defeatSummary = `${defeatSummary}${dashes}Defeats by Player${dashes}`;
-  defeatSummary = buildReportSection(
-    playerCounts,
-    defeatSummary,
-    "planet(s) lost by",
-    "planet(s) lost",
-    true
-  );
+//   defeatSummary = `${defeatSummary}${dashes}Defeats by Player${dashes}`;
+//   defeatSummary = buildReportSection(
+//     playerCounts,
+//     defeatSummary,
+//     "planet(s) lost by",
+//     "planet(s) lost",
+//     true
+//   );
+
+  for (const player in playerCounts) {
+    if (playerList.has(player)) {
+      byPlayerDict[player] = [
+        byPlayerDict[player][0],
+        playerCounts[player].length,
+        0,
+        0,
+      ];
+    } else {
+      playerList.add(player);
+      byPlayerDict[player] = [0, playerCounts[player].length, 0, 0];
+    }
+  }
 
   return [defeatSummary, lostPlanets];
 }
@@ -225,15 +250,30 @@ function getBlownUpCapturesSummary(text) {
     false
   );
 
-  playerCounts = occurrence(destroyedByPlayer);
-  destroyedSummary = `${destroyedSummary}${dashes}Captures blown by player${dashes}`;
-  destroyedSummary = buildReportSection(
-    playerCounts,
-    destroyedSummary,
-    "planet(s) made uninhabitable by",
-    "planet(s) Defeats blown up",
-    true
-  );
+//   playerCounts = occurrence(destroyedByPlayer);
+//   destroyedSummary = `${destroyedSummary}${dashes}Captures blown by player${dashes}`;
+//   destroyedSummary = buildReportSection(
+//     playerCounts,
+//     destroyedSummary,
+//     "planet(s) made uninhabitable by",
+//     "planet(s) Defeats blown up",
+//     true
+//   );
+
+  for (const player in playerCounts) {
+    if (playerList.has(player)) {
+      byPlayerDict[player] = [
+        byPlayerDict[player][0],
+        byPlayerDict[player][1],
+        playerCounts[player].length,
+        0,
+      ];
+    } else {
+      playerList.add(player);
+      byPlayerDict[player] = [0, 0, playerCounts[player].length, 0, 0];
+    }
+  }
+
   return [destroyedSummary, destroyedPlanetList];
 }
 
@@ -271,14 +311,30 @@ function getBlownUpDefeatsSummary(text) {
   );
 
   playerCounts = occurrence(destroyedEAByPlayer);
-  destroyedEASummary = `${destroyedEASummary}${dashes}Defeats blown by player${dashes}`;
-  destroyedEASummary = buildReportSection(
-    playerCounts,
-    destroyedEASummary,
-    "planet(s) made uninhabitable for",
-    "planet(s) destroyed",
-    true
-  );
+//   destroyedEASummary = `${destroyedEASummary}${dashes}Defeats blown by player${dashes}`;
+//   destroyedEASummary = buildReportSection(
+//     playerCounts,
+//     destroyedEASummary,
+//     "planet(s) made uninhabitable for",
+//     "planet(s) destroyed",
+//     true
+//   );
+
+  for (const player in playerCounts) {
+    if (playerList.has(player)) {
+      byPlayerDict[player] = [
+        byPlayerDict[player][0],
+        byPlayerDict[player][1],
+        playerCounts[player][2],
+        playerCounts[player].length,
+      ];
+    } else {
+      playerList.add(player);
+      byPlayerDict[player] = [0, 0, 0, playerCounts[player].length];
+    }
+  }
+  console.log(byPlayerDict);
+  destroyedEASummary = destroyedEASummary + buildCombatPlayerSummary()
   return [destroyedEASummary, destroyEAPlanetList];
 }
 
@@ -510,7 +566,7 @@ function getAidSummary(text) {
 
 function addPlayerNames(array, playerIndex) {
   for (item of array) {
-    playerList.add(item[0])    
+    playerList.add(item[0]);
   }
   return playerList;
 }
@@ -559,4 +615,27 @@ function copyToClipboard(id) {
   copyText.setSelectionRange(0, 99999); /* For mobile devices */
   /* Copy the text inside the text field */
   navigator.clipboard.writeText(copyText.value);
+}
+
+
+function buildCombatPlayerSummary() {
+    combatPlayerSummary = `   <br>
+    <table border = "1">
+        <tr>
+            <th colspan = "6">Combat Player Summary</th>
+        </tr>
+        <th>Player</th><th>Captures</th><th>Defeats</th><th>Blown Up</th><th>Blown Up (lost)</th>`;
+    totals = [0,0,0,0]
+        for (player in byPlayerDict) {
+    combatPlayerSummary = `${combatPlayerSummary}<tr><td>${player}</td><td>${byPlayerDict[player][0]}</td><td>${byPlayerDict[player][1]}</td><td>${byPlayerDict[player][2]}</td><td>${byPlayerDict[player][3]}</td</tr>`;
+    totals = [totals[0]+byPlayerDict[player][0], totals[1]+byPlayerDict[player][1],totals[2]+byPlayerDict[player][2],totals[3]+byPlayerDict[player][3]]
+
+}
+
+combatPlayerSummary = `${combatPlayerSummary}<tr><td>Total</td><td>${totals[0]}</td><td>${totals[1]}</td><td>${totals[2]}</td><td>${totals[3]}</td</tr>`;
+
+
+
+combatPlayerSummary = `${combatPlayerSummary}</table></body>`;
+return combatPlayerSummary;
 }
