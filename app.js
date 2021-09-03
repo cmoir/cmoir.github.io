@@ -12,18 +12,12 @@ function analyse() {
   text = document.getElementById("news").value;
   text = addLineNumber(text);
 
-  exploredTemp = getExploredPlanetSummary(text);
-  exploredPlanetList = exploredTemp[1];
-  report = exploredTemp[0];
-
+  exploredPlanetList = getExploredPlanetSummary(text);
   capturedPlanets = getCapturedPlanetSummary(text);
-
   lostPlanets = getLostPlanetSummary(text);
-
   blownUpCapturesPlanets = getBlownUpCapturesSummary(text);
-
   blownUpDefeatsTemp = getBlownUpDefeatsSummary(text);
-  report = report + blownUpDefeatsTemp[0];
+  report = blownUpDefeatsTemp[0];
   blownUpDefeatsPlanets = blownUpDefeatsTemp[1];
   report = report + getAidSummary(text);
 
@@ -83,15 +77,13 @@ function getExploredPlanetSummary(text) {
   }
 
   exploredCounts = occurrence(exploredArray);
-  exploredSummary = `${doc}${dashes}Explored${dashes}`;
-  exploredSummary = buildReportSection(
-    exploredCounts,
-    exploredSummary,
-    "planet(s) Explored by",
-    "planet(s) Explored",
-    true
-  );
-  return [exploredSummary, exploredPlanetList];
+  for (const player in exploredCounts) {
+    playerList.add(player);
+    byPlayerDict[player] = [exploredCounts[player].length, 0, 0, 0, 0];
+  }
+  console.log(byPlayerDict)
+
+  return exploredPlanetList;
 }
 
 function getCapturedPlanetSummary(text) {
@@ -123,20 +115,15 @@ function getCapturedPlanetSummary(text) {
     byFamilyDict[family] = [familyCounts[family].length, 0, 0, 0];
   }
 
-//   enemyPlayerCounts = occurrence(capturedfromEnemyPlayer);
-//   capturedSummary = `${dashes}Captured from player${dashes}`;
-//   capturedSummary = buildReportSection(
-//     enemyPlayerCounts,
-//     capturedSummary,
-//     "planet(s) captured from",
-//     "planet(s) captured",
-//     false
-//   );
   console.log(byPlayerDict)
   playerCounts = occurrence(capturedByPlayer);
   for (const player in playerCounts) {
-    playerList.add(player);
-    byPlayerDict[player] = [playerCounts[player].length, 0, 0, 0];
+    if (playerList.has(player)) {
+      byPlayerDict[player] = [byPlayerDict[player][0], playerCounts[player].length, 0, 0, 0];
+    } else {
+      playerList.add(player);
+      byPlayerDict[player] = [0, playerCounts[player].length, 0, 0, 0];
+    }
   }
   console.log(byPlayerDict)
   return capturedPlanetsList;
@@ -179,10 +166,10 @@ function getLostPlanetSummary(text) {
   playerCounts = occurrence(capturedFromPlayer);
   for (const player in playerCounts) {
     if (playerList.has(player)) {
-      byPlayerDict[player] = [byPlayerDict[player][0], playerCounts[player].length, 0, 0];
+      byPlayerDict[player] = [byPlayerDict[player][0], byPlayerDict[player][1], playerCounts[player].length, 0, 0];
     } else {
       playerList.add(player);
-      byPlayerDict[player] = [0, playerCounts[player].length, 0, 0];
+      byPlayerDict[player] = [0, 0, playerCounts[player].length, 0, 0];
     }
   }
   console.log(byPlayerDict)
@@ -224,11 +211,12 @@ function getBlownUpCapturesSummary(text) {
   playerCounts = occurrence(destroyedByPlayer);
   for (const player in playerCounts) {
     if (playerList.has(player)) {
-      byPlayerDict[player] = [byPlayerDict[player][0],byPlayerDict[player][1], playerCounts[player].length, 0];
+      byPlayerDict[player] = [byPlayerDict[player][0],byPlayerDict[player][1],byPlayerDict[player][2],playerCounts[player].length, 0];
     } else {
       playerList.add(player);
-      byPlayerDict[player] = [0, 0, playerCounts[player].length, 0];
-    }  }
+      byPlayerDict[player] = [0, 0, 0, playerCounts[player].length, 0];
+    }
+  }
 
   return destroyedPlanetList;
 }
@@ -270,15 +258,10 @@ function getBlownUpDefeatsSummary(text) {
   console.log(byPlayerDict);
   for (const player in playerCounts) {
     if (playerList.has(player)) {
-      byPlayerDict[player] = [
-        byPlayerDict[player][0],
-        byPlayerDict[player][1],
-        byPlayerDict[player][2],
-        playerCounts[player].length,
-      ];
+      byPlayerDict[player] = [byPlayerDict[player][0],byPlayerDict[player][1],byPlayerDict[player][2],byPlayerDict[player][3], playerCounts[player].length];
     } else {
       playerList.add(player);
-      byPlayerDict[player] = [0, 0, 0, playerCounts[player].length];
+      byPlayerDict[player] = [0, 0, 0, 0, playerCounts[player].length];
     }
   }
   console.log(byPlayerDict);
@@ -566,18 +549,18 @@ function copyToClipboard(id) {
 
 
 function buildCombatSummary() {
-    combatTableSummary = `   <br>
+    combatTableSummary = `${doc}<br>
     <table border = "1">
         <tr>
             <th colspan = "6">Combat Player Summary</th>
         </tr>
-        <th>Player</th><th>Captures</th><th>Defeats</th><th>Blown Up</th><th>Blown Up (lost)</th>`;
-    totals = [0,0,0,0]
+        <th>Player</th><th>Explored</th><th>Captures</th><th>Defeats</th><th>Blown Up</th><th>Blown Up (lost)</th>`;
+    totals = [0,0,0,0,0]
         for (player in byPlayerDict) {
-    combatTableSummary = `${combatTableSummary}<tr><td>${player}</td><td>${byPlayerDict[player][0]}</td><td>${byPlayerDict[player][1]}</td><td>${byPlayerDict[player][2]}</td><td>${byPlayerDict[player][3]}</td</tr>`;
-    totals = [totals[0]+byPlayerDict[player][0], totals[1]+byPlayerDict[player][1],totals[2]+byPlayerDict[player][2],totals[3]+byPlayerDict[player][3]]
+    combatTableSummary = `${combatTableSummary}<tr><td>${player}</td><td>${byPlayerDict[player][0]}</td><td>${byPlayerDict[player][1]}</td><td>${byPlayerDict[player][2]}</td><td>${byPlayerDict[player][3]}</td><td>${byPlayerDict[player][4]}</td></tr>`;
+    totals = [totals[0]+byPlayerDict[player][0], totals[1]+byPlayerDict[player][1],totals[2]+byPlayerDict[player][2],totals[3]+byPlayerDict[player][3],totals[4]+byPlayerDict[player][4]]
 }
-combatTableSummary = `${combatTableSummary}<tr><td>Total</td><td>${totals[0]}</td><td>${totals[1]}</td><td>${totals[2]}</td><td>${totals[3]}</td</tr></table>`;
+combatTableSummary = `${combatTableSummary}<tr><td>Total</td><td>${totals[0]}</td><td>${totals[1]}</td><td>${totals[2]}</td><td>${totals[3]}</td><td>${totals[4]}</td></tr></table>`;
 
 combatTableSummary = `${combatTableSummary}<br>
 <table border = "1">
@@ -587,10 +570,10 @@ combatTableSummary = `${combatTableSummary}<br>
     <th>Family</th><th>Captures</th><th>Defeats</th><th>Blown Up</th><th>Blown Up (lost)</th>`;
 totals = [0,0,0,0]
     for (family in byFamilyDict) {
-combatTableSummary = `${combatTableSummary}<tr><td>${family}</td><td>${byFamilyDict[family][0]}</td><td>${byFamilyDict[family][1]}</td><td>${byFamilyDict[family][2]}</td><td>${byFamilyDict[family][3]}</td</tr>`;
+combatTableSummary = `${combatTableSummary}<tr><td>${family}</td><td>${byFamilyDict[family][0]}</td><td>${byFamilyDict[family][1]}</td><td>${byFamilyDict[family][2]}</td><td>${byFamilyDict[family][3]}</td></tr>`;
 totals = [totals[0]+byFamilyDict[family][0], totals[1]+byFamilyDict[family][1],totals[2]+byFamilyDict[family][2],totals[3]+byFamilyDict[family][3]]
 }
-combatTableSummary = `${combatTableSummary}<tr><td>Total</td><td>${totals[0]}</td><td>${totals[1]}</td><td>${totals[2]}</td><td>${totals[3]}</td</tr>`;
+combatTableSummary = `${combatTableSummary}<tr><td>Total</td><td>${totals[0]}</td><td>${totals[1]}</td><td>${totals[2]}</td><td>${totals[3]}</td></tr>`;
 
 
 
