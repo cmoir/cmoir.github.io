@@ -2,9 +2,11 @@ dashes = "<br>--------------------<br>";
 doc =
   '<!DOCTYPE html><html><head><link REL=STYLESHEET HREF="ic.css" TYPE="text/css"></head><body>';
 var playerList = new Set();
+var ememyFamilyList = new Set();
 var capturedPanetsArray = [];
 var planetsArray = [];
 var byPlayerDict = {};
+var byFamilyDict = {};
 
 function analyse() {
   text = document.getElementById("news").value;
@@ -14,21 +16,16 @@ function analyse() {
   exploredPlanetList = exploredTemp[1];
   report = exploredTemp[0];
 
-  capturedTemp = getCapturedPlanetSummary(text);
-  report = report + capturedTemp[0];
-  capturedPlanets = capturedTemp[1];
+  capturedPlanets = getCapturedPlanetSummary(text);
 
-  LostTemp = getLostPlanetSummary(text);
-  report = report + LostTemp[0];
-  lostPlanets = LostTemp[1];
+  lostPlanets = getLostPlanetSummary(text);
 
-  blownUpCapturesTemp = getBlownUpCapturesSummary(text);
-  report = report + blownUpCapturesTemp[0];
-  blownUpCapturesPlanets = blownUpCapturesTemp[1];
+  blownUpCapturesPlanets = getBlownUpCapturesSummary(text);
 
   blownUpDefeatsTemp = getBlownUpDefeatsSummary(text);
   report = report + blownUpDefeatsTemp[0];
   blownUpDefeatsPlanets = blownUpDefeatsTemp[1];
+  report = report + getAidSummary(text);
 
   openRetakeTemp = findOpenRetakes(
     lostPlanets,
@@ -44,7 +41,7 @@ function analyse() {
       exploredPlanetList,
       capturedPlanets
     );
-  report = report + getAidSummary(text);
+  
   return [report, openRetakeCleanList];
 }
 
@@ -121,43 +118,28 @@ function getCapturedPlanetSummary(text) {
   }
 
   familyCounts = occurrence(capturedByFamily);
-  capturedSummary = `${dashes}Captured from Family${dashes}`;
-  capturedSummary = buildReportSection(
-    familyCounts,
-    capturedSummary,
-    "planet(s) captured from",
-    "planet(s) captured",
-    false
-  );
+  for (const family in familyCounts) {
+    ememyFamilyList.add(family);
+    byFamilyDict[family] = [familyCounts[family].length, 0, 0, 0];
+  }
 
-  enemyPlayerCounts = occurrence(capturedfromEnemyPlayer);
-
-  capturedSummary = `${capturedSummary}${dashes}Captured from player${dashes}`;
-  capturedSummary = buildReportSection(
-    enemyPlayerCounts,
-    capturedSummary,
-    "planet(s) captured from",
-    "planet(s) captured",
-    false
-  );
-
-  playerCounts = occurrence(capturedByPlayer);
-//   capturedSummary = `${capturedSummary}${dashes}Captured by player${dashes}`;
+//   enemyPlayerCounts = occurrence(capturedfromEnemyPlayer);
+//   capturedSummary = `${dashes}Captured from player${dashes}`;
 //   capturedSummary = buildReportSection(
-//     playerCounts,
+//     enemyPlayerCounts,
 //     capturedSummary,
-//     "planet(s) captured by",
+//     "planet(s) captured from",
 //     "planet(s) captured",
-//     true
+//     false
 //   );
-  //add values to summary table
-  // addPlayerNames(playerCounts, 0);
+  console.log(byPlayerDict)
+  playerCounts = occurrence(capturedByPlayer);
   for (const player in playerCounts) {
     playerList.add(player);
     byPlayerDict[player] = [playerCounts[player].length, 0, 0, 0];
   }
-
-  return [capturedSummary, capturedPlanetsList];
+  console.log(byPlayerDict)
+  return capturedPlanetsList;
 }
 
 function getLostPlanetSummary(text) {
@@ -183,41 +165,30 @@ function getLostPlanetSummary(text) {
   }
 
   familyCounts = occurrence(capturedByFamily);
-  defeatSummary = `${dashes}Family Defeats${dashes}`;
-  defeatSummary = buildReportSection(
-    familyCounts,
-    defeatSummary,
-    "planet(s) captured by",
-    "planet(s) lost",
-    false
-  );
 
+  for (const family in familyCounts) {
+    if (ememyFamilyList.has(family)) {
+        byFamilyDict[family] = [byFamilyDict[family][0], familyCounts[family].length, 0, 0,];
+    } else {
+        ememyFamilyList.add(family);
+      byFamilyDict[family] = [0, familyCounts[family].length, 0, 0];
+    }
+  }
+
+  console.log(byPlayerDict)
   playerCounts = occurrence(capturedFromPlayer);
-//   defeatSummary = `${defeatSummary}${dashes}Defeats by Player${dashes}`;
-//   defeatSummary = buildReportSection(
-//     playerCounts,
-//     defeatSummary,
-//     "planet(s) lost by",
-//     "planet(s) lost",
-//     true
-//   );
-
   for (const player in playerCounts) {
     if (playerList.has(player)) {
-      byPlayerDict[player] = [
-        byPlayerDict[player][0],
-        playerCounts[player].length,
-        0,
-        0,
-      ];
+      byPlayerDict[player] = [byPlayerDict[player][0], playerCounts[player].length, 0, 0];
     } else {
       playerList.add(player);
       byPlayerDict[player] = [0, playerCounts[player].length, 0, 0];
     }
   }
-
-  return [defeatSummary, lostPlanets];
+  console.log(byPlayerDict)
+  return lostPlanets;
 }
+
 
 function getBlownUpCapturesSummary(text) {
   //example
@@ -241,40 +212,25 @@ function getBlownUpCapturesSummary(text) {
   }
 
   familyCounts = occurrence(destroyedFamily);
-  destroyedSummary = `${dashes}Captures blown against family${dashes}`;
-  destroyedSummary = buildReportSection(
-    familyCounts,
-    destroyedSummary,
-    "planet(s) made uninhabitable for",
-    "planet(s) Captures blown up",
-    false
-  );
-
-//   playerCounts = occurrence(destroyedByPlayer);
-//   destroyedSummary = `${destroyedSummary}${dashes}Captures blown by player${dashes}`;
-//   destroyedSummary = buildReportSection(
-//     playerCounts,
-//     destroyedSummary,
-//     "planet(s) made uninhabitable by",
-//     "planet(s) Defeats blown up",
-//     true
-//   );
-
-  for (const player in playerCounts) {
-    if (playerList.has(player)) {
-      byPlayerDict[player] = [
-        byPlayerDict[player][0],
-        byPlayerDict[player][1],
-        playerCounts[player].length,
-        0,
-      ];
+  for (const family in familyCounts) {
+    if (ememyFamilyList.has(family)) {
+        byFamilyDict[family] = [byFamilyDict[family][0], byFamilyDict[family][1], familyCounts[family].length, 0,];
     } else {
-      playerList.add(player);
-      byPlayerDict[player] = [0, 0, playerCounts[player].length, 0, 0];
+        ememyFamilyList.add(family);
+      byFamilyDict[family] = [0, 0, familyCounts[family].length, 0];
     }
   }
 
-  return [destroyedSummary, destroyedPlanetList];
+  playerCounts = occurrence(destroyedByPlayer);
+  for (const player in playerCounts) {
+    if (playerList.has(player)) {
+      byPlayerDict[player] = [byPlayerDict[player][0],byPlayerDict[player][1], playerCounts[player].length, 0];
+    } else {
+      playerList.add(player);
+      byPlayerDict[player] = [0, 0, playerCounts[player].length, 0];
+    }  }
+
+  return destroyedPlanetList;
 }
 
 function getBlownUpDefeatsSummary(text) {
@@ -301,31 +257,23 @@ function getBlownUpDefeatsSummary(text) {
   }
 
   familyCounts = occurrence(destroyedEAFamily);
-  destroyedEASummary = `${dashes}Defeats blown by family${dashes}`;
-  destroyedEASummary = buildReportSection(
-    familyCounts,
-    destroyedEASummary,
-    "planet(s) made uninhabitable by",
-    "planet(s) destroyed",
-    false
-  );
+  for (const family in familyCounts) {
+    if (ememyFamilyList.has(family)) {
+        byFamilyDict[family] = [byFamilyDict[family][0], byFamilyDict[family][1], byFamilyDict[family][2], familyCounts[family].length,];
+    } else {
+        ememyFamilyList.add(family);
+      byFamilyDict[family] = [0, 0, 0, familyCounts[family].length];
+    }
+  }
 
   playerCounts = occurrence(destroyedEAByPlayer);
-//   destroyedEASummary = `${destroyedEASummary}${dashes}Defeats blown by player${dashes}`;
-//   destroyedEASummary = buildReportSection(
-//     playerCounts,
-//     destroyedEASummary,
-//     "planet(s) made uninhabitable for",
-//     "planet(s) destroyed",
-//     true
-//   );
-
+  console.log(byPlayerDict);
   for (const player in playerCounts) {
     if (playerList.has(player)) {
       byPlayerDict[player] = [
         byPlayerDict[player][0],
         byPlayerDict[player][1],
-        playerCounts[player][2],
+        byPlayerDict[player][2],
         playerCounts[player].length,
       ];
     } else {
@@ -334,8 +282,7 @@ function getBlownUpDefeatsSummary(text) {
     }
   }
   console.log(byPlayerDict);
-  destroyedEASummary = destroyedEASummary + buildCombatPlayerSummary()
-  return [destroyedEASummary, destroyEAPlanetList];
+  return [buildCombatSummary(), destroyEAPlanetList];
 }
 
 function findOpenRetakes(lostPlanets, capturedPlanets, blownUpCapturesPlanets) {
@@ -618,8 +565,8 @@ function copyToClipboard(id) {
 }
 
 
-function buildCombatPlayerSummary() {
-    combatPlayerSummary = `   <br>
+function buildCombatSummary() {
+    combatTableSummary = `   <br>
     <table border = "1">
         <tr>
             <th colspan = "6">Combat Player Summary</th>
@@ -627,15 +574,27 @@ function buildCombatPlayerSummary() {
         <th>Player</th><th>Captures</th><th>Defeats</th><th>Blown Up</th><th>Blown Up (lost)</th>`;
     totals = [0,0,0,0]
         for (player in byPlayerDict) {
-    combatPlayerSummary = `${combatPlayerSummary}<tr><td>${player}</td><td>${byPlayerDict[player][0]}</td><td>${byPlayerDict[player][1]}</td><td>${byPlayerDict[player][2]}</td><td>${byPlayerDict[player][3]}</td</tr>`;
+    combatTableSummary = `${combatTableSummary}<tr><td>${player}</td><td>${byPlayerDict[player][0]}</td><td>${byPlayerDict[player][1]}</td><td>${byPlayerDict[player][2]}</td><td>${byPlayerDict[player][3]}</td</tr>`;
     totals = [totals[0]+byPlayerDict[player][0], totals[1]+byPlayerDict[player][1],totals[2]+byPlayerDict[player][2],totals[3]+byPlayerDict[player][3]]
-
 }
+combatTableSummary = `${combatTableSummary}<tr><td>Total</td><td>${totals[0]}</td><td>${totals[1]}</td><td>${totals[2]}</td><td>${totals[3]}</td</tr></table>`;
 
-combatPlayerSummary = `${combatPlayerSummary}<tr><td>Total</td><td>${totals[0]}</td><td>${totals[1]}</td><td>${totals[2]}</td><td>${totals[3]}</td</tr>`;
+combatTableSummary = `${combatTableSummary}<br>
+<table border = "1">
+    <tr>
+        <th colspan = "6">Combat Family Summary</th>
+    </tr>
+    <th>Family</th><th>Captures</th><th>Defeats</th><th>Blown Up</th><th>Blown Up (lost)</th>`;
+totals = [0,0,0,0]
+    for (family in byFamilyDict) {
+combatTableSummary = `${combatTableSummary}<tr><td>${family}</td><td>${byFamilyDict[family][0]}</td><td>${byFamilyDict[family][1]}</td><td>${byFamilyDict[family][2]}</td><td>${byFamilyDict[family][3]}</td</tr>`;
+totals = [totals[0]+byFamilyDict[family][0], totals[1]+byFamilyDict[family][1],totals[2]+byFamilyDict[family][2],totals[3]+byFamilyDict[family][3]]
+}
+combatTableSummary = `${combatTableSummary}<tr><td>Total</td><td>${totals[0]}</td><td>${totals[1]}</td><td>${totals[2]}</td><td>${totals[3]}</td</tr>`;
 
 
 
-combatPlayerSummary = `${combatPlayerSummary}</table></body>`;
-return combatPlayerSummary;
+
+combatTableSummary = `${combatTableSummary}</table></body>`;
+return combatTableSummary;
 }
